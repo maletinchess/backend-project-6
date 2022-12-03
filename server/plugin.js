@@ -25,6 +25,9 @@ import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
