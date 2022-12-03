@@ -6,6 +6,7 @@ dotenv.config();
 
 import { fileURLToPath } from 'url';
 import path from 'path';
+import fs from 'fs';
 import fastifyStatic from '@fastify/static';
 // NOTE: не поддердивает fastify 4.x
 // import fastifyErrorPage from 'fastify-error-page';
@@ -89,7 +90,8 @@ const registerPlugins = async (app) => {
   await app.register(fastifyReverseRoutes);
   await app.register(fastifyFormbody, { parser: qs.parse });
   await app.register(fastifySecureSession, {
-    key: process.env.SESSION_KEY,
+    secret: process.env.SESSION_KEY,
+    key: fs.readFileSync(path.join(__dirname, 'secret-key')),
     cookie: {
       path: '/',
     },
