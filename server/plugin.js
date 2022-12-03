@@ -91,7 +91,7 @@ const registerPlugins = async (app) => {
   await app.register(fastifyFormbody, { parser: qs.parse });
   await app.register(fastifySecureSession, {
     secret: process.env.SESSION_KEY,
-    key: fs.readFileSync(path.join(__dirname, 'secret-key')),
+    key: process.env.KEY,
     cookie: {
       path: '/',
     },
