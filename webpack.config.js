@@ -12,6 +12,10 @@ export default {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
+      {
+        test: /\.jpg/,
+        type: 'asset/resource',
+      }
     ],
   },
   plugins: [new MiniCssExtractPlugin()],
