@@ -85,7 +85,8 @@ describe('test users CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const updatedUser = await models.user.query().findById(id);
+    const updatedUser = await models.user.query().findById(8);
+    console.log(updatedUser);
 
     const expected = {
       ..._.omit(newParams, 'password'),
@@ -93,7 +94,22 @@ describe('test users CRUD', () => {
     }
     console.log(expected);
     expect(updatedUser).toMatchObject(expected);
-  })
+  });
+
+  it('delete', async () => {
+    const params = testData.users.existing;
+    const user = await models.user.query().findOne({ email: params.email });
+    const { id } = user;
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('usersDelete', { id }),
+    });
+
+    expect(response.statusCode).toBe(200);
+
+    const removedUser = await models.user.query().findById(id);
+    expect(removedUser).toBeUndefined();
+  });
 
   afterEach(async () => {
     // Пока Segmentation fault: 11
