@@ -28,5 +28,17 @@ export default (app) => {
       }
 
       return reply;
+    })
+    .patch('/users/:id', { name: 'updateUser'}, async (req, reply) => {
+      try {
+        const { id } = req.params;
+        const user = app.objection.models.user.query().findById(id);
+        await user.query().patch(req.body.data);
+        reply.redirect(app.reverse('users'));
+        return reply;
+      }
+      catch(err) {
+        console.log(err);
+      };
     });
 };
