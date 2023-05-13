@@ -77,7 +77,7 @@ describe('test users CRUD', () => {
     const { id } = user;
     const response = await app.inject({
       method: 'PATCH',
-      url: app.reverse('usersToUpdate', { id }),
+      url: app.reverse('updateUser', { id }),
       payload: {
         data: newParams,
       },
@@ -85,24 +85,24 @@ describe('test users CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const updatedUser = await models.user.query().findById(8);
-    console.log(updatedUser);
+    const updatedUser = await models.user.query().findById(id);
 
     const expected = {
       ..._.omit(newParams, 'password'),
-      passwordDigest: encrypt(params.password),
+      passwordDigest: encrypt(newParams.password),
     }
-    console.log(expected);
     expect(updatedUser).toMatchObject(expected);
   });
 
   it('delete', async () => {
     const params = testData.users.existing;
-    const user = await models.user.query().findOne({ email: params.email });
+    console.log(params, 'todelete');
+    const user = await models.user.query().findOne({ email: testData.users.toUpdate.email });
+    console.log(user, 'todelete');
     const { id } = user;
     const response = await app.inject({
       method: 'DELETE',
-      url: app.reverse('usersDelete', { id }),
+      url: app.reverse('deleteUser', { id }),
     });
 
     expect(response.statusCode).toBe(200);

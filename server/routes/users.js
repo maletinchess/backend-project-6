@@ -32,8 +32,9 @@ export default (app) => {
     .patch('/users/:id', { name: 'updateUser'}, async (req, reply) => {
       try {
         const { id } = req.params;
-        const user = app.objection.models.user.query().findById(id);
-        await user.query().patch(req.body.data);
+        const userToEdit = await app.objection.models.user.query().findById(id);
+        await console.log(userToEdit, 'PATCH LOG');
+        await userToEdit.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.users.edit.success'));
         reply.redirect(app.reverse('users'));
         return reply;
@@ -42,11 +43,11 @@ export default (app) => {
         console.log(err);
       };
     })
-    .delete('users/:id', { name: 'deleteUser'}, async (req, reply) => {
+    .delete('/users/:id', { name: 'deleteUser'}, async (req, reply) => {
       try {
         const { id } = req.params;
-        const user = app.objection.models.user.query().findById(id);
-        await user.query().delete();
+        const user = await app.objection.models.user.query().findById(id);
+        await user.$query().delete();
         req.flash('success', i18next.t('flash.users.delete.success'));
         reply.redirect(app.reverse('users'));
         return reply;
