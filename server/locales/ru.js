@@ -47,6 +47,14 @@ export default {
           submit: 'Сохранить',
           signUp: 'Регистрация',
         },
+        actions: {
+          header: 'Действия',
+          delete: 'Удалить',
+          edit: 'Изменить',
+        },
+        edit: {
+          submit: 'Сохранить',
+        }
       },
       welcome: {
         index: {

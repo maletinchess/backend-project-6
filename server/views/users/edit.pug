@@ -1,0 +1,12 @@
+extends ../layouts/application.pug
+
+block header
+  = t('views.users.new.signUp')
+
+block content
+  +formFor()(action=route('editUser', { id: userToEdit.id }) method='post')
+    +input(user, 'firstname', errors)(type="text")
+    +input(user, 'lastname', errors)(type="text")
+    +input(userToEdit, 'email', errors)(type="text")
+    +input(userToEdit, 'password', errors)(type="password")
+    +submit(userToEdit)(value=t('views.users.edit.submit'))
