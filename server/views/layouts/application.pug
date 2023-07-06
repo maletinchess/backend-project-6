@@ -16,13 +16,15 @@ html(lang="en")
             li
               a.nav-link.px-2.text-secondary(href=route('users'))= t('layouts.application.users')
         .text-end
+      ul.navbar-nav
         if isAuthenticated()
-          +buttonTo(route('session'), 'delete')(class="btn nav-link" value=t('layouts.application.signOut'))
+          li.nav-item
+            +buttonTo(route('session'), 'delete')(class="btn nav-link" value=t('layouts.application.signOut'))
         else
-          button.btn.btn-outline-light.me-2
-            a.text-dark.text-decoration-none(href=route('newSession'))= t('layouts.application.signIn')
-          button.btn.btn-warning
-            a.text-dark.text-decoration-none(href=route('newUser'))= t('layouts.application.signUp')
+          li.nav-item
+            a.nav-link(href=route('newSession'))= t('layouts.application.signIn')
+          li.nav-item
+            a.nav-link(href=route('newUser'))= t('layouts.application.signUp')
     .container.wrapper.flex-grow-1
       each messages, type in reply.flash() || []
         each message in messages
