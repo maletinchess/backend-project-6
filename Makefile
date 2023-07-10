@@ -10,7 +10,7 @@ build:
 	npm run build
 
 prepare:
-	cp -n .env.example .env || true
+	cp -n .env || true
 
 start:
 	fastify start server/plugin.js -l debug -P -o
