@@ -23,6 +23,7 @@ export default (app) => {
       const user = new app.objection.models.user();
       user.$set(req.body.data);
       const users = await app.objection.models.user.query();
+      console.log(req.body.data);
 
       try {
         const validUser = await app.objection.models.user.fromJson(req.body.data);
@@ -31,16 +32,18 @@ export default (app) => {
         await console.log(users);
         req.flash('info', i18next.t('flash.users.create.success'));
         reply.redirect(app.reverse('root'));
-      } catch ({ data }) {
+      } catch (err) {
+        const { data } = err;
+        await console.log(err);
         req.flash('error', i18next.t('flash.users.create.error'));
-        await console.log(users);
         reply.render('users/new', { user, errors: data });
       }
 
       return reply;
     })
-    .patch('/users/:id', { name: 'updateUser'}, async (req, reply) => {
+    .post('/users/:id', { name: 'updateUser' }, async (req, reply) => {
       try {
+        await console.log(req.params);
         const { id } = req.params;
         const userToEdit = await app.objection.models.user.query().findById(id);
         await console.log(userToEdit, 'PATCH LOG');
@@ -50,7 +53,7 @@ export default (app) => {
         return reply;
       }
       catch(err) {
-        console.log(err);
+        throw err;
       };
     })
     .delete('/users/:id', { name: 'deleteUser'}, async (req, reply) => {

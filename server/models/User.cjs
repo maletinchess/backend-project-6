@@ -17,8 +17,8 @@ module.exports = class User extends unique(BaseModel) {
       required: ['email', 'password'],
       properties: {
         id: { type: 'integer' },
-        firstname: { type: 'string' },
-        lastname: { type: 'string' },
+        firstName: { type: 'string' },
+        lastName: { type: 'string' },
         email: { type: 'string', minLength: 1 },
         password: { type: 'string', minLength: 3 },
       },

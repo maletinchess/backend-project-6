@@ -19,7 +19,7 @@ export default {
           success: 'Пользователь успешно зарегистрирован',
         },
         edit: {
-          success: 'Пользователь успешно зарегистрирован',
+          success: 'Пользователь успешно изменён',
         }
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
@@ -41,6 +41,8 @@ export default {
       },
       users: {
         id: 'ID',
+        firstName: 'Полное имя',
+        lastName: '',
         email: 'Email',
         createdAt: 'Дата создания',
         new: {
@@ -54,7 +56,7 @@ export default {
         },
         edit: {
           submit: 'Сохранить',
-        }
+        },
       },
       welcome: {
         index: {
