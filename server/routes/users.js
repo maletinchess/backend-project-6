@@ -13,8 +13,10 @@ export default (app) => {
       const user = new app.objection.models.user();
       reply.render('users/new', { user });
     })
-    .get('/users/:id/edit', { name: 'editUser' }, async (req, reply) => {
+    .get('/users/:id/edit', { name: 'editUser', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
+      await console.log(req.user);
+      await console.log(id);
       const userToEdit = await app.objection.models.user.query().findById(id);
       reply.render('users/edit', { userToEdit });
       return reply;
@@ -23,13 +25,10 @@ export default (app) => {
       const user = new app.objection.models.user();
       user.$set(req.body.data);
       const users = await app.objection.models.user.query();
-      console.log(req.body.data);
 
       try {
         const validUser = await app.objection.models.user.fromJson(req.body.data);
-        await console.log(validUser);
         await app.objection.models.user.query().insert(validUser);
-        await console.log(users);
         req.flash('info', i18next.t('flash.users.create.success'));
         reply.redirect(app.reverse('root'));
       } catch (err) {
@@ -41,9 +40,10 @@ export default (app) => {
 
       return reply;
     })
-    .post('/users/:id', { name: 'updateUser' }, async (req, reply) => {
+    .post('/users/:id', { name: 'updateUser', preValidation: app.authenticate }, async (req, reply) => {
       try {
-        await console.log(req.params);
+        await console.log(req.user, 'USER_REQ LOG');
+        await console.log(req.params, 'PARAMS_LOG');
         const { id } = req.params;
         const userToEdit = await app.objection.models.user.query().findById(id);
         await console.log(userToEdit, 'PATCH LOG');

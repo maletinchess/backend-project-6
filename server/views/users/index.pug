@@ -20,6 +20,7 @@ block content
           td= user.email
           td= formatDate(user.createdAt)
           td
-            button.btn.btn-primary
-              a.text-dark.text-decoration-none(href=route('editUser', { id: user.id }))= t('views.users.actions.edit')
+            a.text-dark.text-decoration-none(href=route('editUser', { id: user.id }))= t('views.users.actions.edit')
+            
+
            
