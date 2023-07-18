@@ -10,12 +10,10 @@ mixin input(entity, propertyName, errors = {})
   - classLine = 'form-control' + (_.isEmpty(propertyErrors) ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
   .mb-3(class=(errors[propertyName] && 'has-danger'))
-    label(
-      for= inputId
-    )= propertyName
     input(
       id= inputId
       name=getInputName(propertyName)
+      placeholder= propertyName
       class=classLine
       value=_.get(entity, propertyName, '')
     )&attributes(attributes)

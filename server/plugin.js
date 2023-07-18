@@ -113,6 +113,16 @@ const registerPlugins = async (app) => {
   // @ts-ignore
   )(...args));
 
+  app.decorate('checkEditAndDeletePermission', async (req, reply) => {
+    const { id: paramsId } = req.params;
+    console.log(paramsId);
+
+    if (req.user?.id !== parseInt(paramsId, 10)) {
+      req.flash('error', i18next.t('flash.users.authError'));
+      reply.redirect(app.reverse('users'));
+    }
+  })
+
   await app.register(fastifyMethodOverride);
   await app.register(fastifyObjectionjs, {
     knexConfig: knexConfig[mode],

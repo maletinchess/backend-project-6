@@ -20,7 +20,11 @@ block content
           td= user.email
           td= formatDate(user.createdAt)
           td
-            a.text-dark.text-decoration-none(href=route('editUser', { id: user.id }))= t('views.users.actions.edit')
+            ul.nav.border-bottom
+              li
+                a.btn.btn-primary.mx-2(href=route('editUser', { id: user.id }))= t('views.users.actions.edit')
+              li
+                +buttonTo(route('deleteUser', { id: user.id }), 'delete')(class="btn btn-danger" value=t('views.users.actions.delete'))
             
 
            
