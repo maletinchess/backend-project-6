@@ -15,8 +15,6 @@ export default (app) => {
     })
     .get('/users/:id/edit', { name: 'editUser', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
       const { id } = req.params;
-      await console.log(req.user);
-      await console.log(id);
       const userToEdit = await app.objection.models.user.query().findById(id);
       reply.render('users/edit', { userToEdit });
       return reply;
@@ -24,7 +22,6 @@ export default (app) => {
     .post('/users', async (req, reply) => {
       const user = new app.objection.models.user();
       user.$set(req.body.data);
-      const users = await app.objection.models.user.query();
 
       try {
         const validUser = await app.objection.models.user.fromJson(req.body.data);
@@ -42,11 +39,8 @@ export default (app) => {
     })
     .post('/users/:id', { name: 'updateUser' }, async (req, reply) => {
       try {
-        await console.log(req.user, 'USER_REQ LOG');
-        await console.log(req.params, 'PARAMS_LOG');
         const { id } = req.params;
         const userToEdit = await app.objection.models.user.query().findById(id);
-        await console.log(userToEdit, 'PATCH LOG');
         await userToEdit.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.users.edit.success'));
         reply.redirect(app.reverse('users'));
@@ -56,14 +50,20 @@ export default (app) => {
         throw err;
       };
     })
-    .delete('/users/:id', { name: 'deleteUser', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
+    .delete('/users/:id', {
+      name: 'deleteUser',
+    }, async (req, reply) => {
+      await console.log(req.user);
+      await console.log(req.session);
       try {
         const { id } = req.params;
         const user = await app.objection.models.user.query().findById(id);
-        await console.log(req.params);
+        await console.log(req.params, 'DELETE ROUTE LOG - PARAMS');
+        await console.log(user, '\n', 'DELETE ROUTE LOG - USER');
         await user.$query().delete();
+        req.logout();
         req.flash('success', i18next.t('flash.users.delete.success'));
-        reply.redirect('/users');
+        reply.redirect(app.reverse('users'));
         return reply;
       }
       catch(err) {

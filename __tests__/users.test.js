@@ -6,6 +6,7 @@ import fastify from 'fastify';
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData } from './helpers/index.js';
+import session from '../server/routes/session.js';
 
 describe('test users CRUD', () => {
   let app;
@@ -76,7 +77,7 @@ describe('test users CRUD', () => {
     const user = await models.user.query().findOne({ email: params.email });
     const { id } = user;
     const response = await app.inject({
-      method: 'PATCH',
+      method: 'POST',
       url: app.reverse('updateUser', { id }),
       payload: {
         data: newParams,
@@ -95,17 +96,35 @@ describe('test users CRUD', () => {
   });
 
   it('delete', async () => {
-    const params = testData.users.existing;
-    console.log(params, 'todelete');
-    const user = await models.user.query().findOne({ email: testData.users.toUpdate.email });
-    console.log(user, 'todelete');
+    const userToDeleteData = testData.users.toDelete;
+    await console.log(userToDeleteData, 'to delete PARAMS');
+    const user = await models.user.query().findOne({ email: userToDeleteData.email });
+    const users = await models.user.query();
+    await console.log(users, 'DATABASE');
     const { id } = user;
-    const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('deleteUser', { id }),
+
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: userToDeleteData,
+      },
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(responseSignIn.statusCode).toBe(200);
+
+    const [sessionCookie] = responseSignIn.cookies;
+    await console.log(responseSignIn.cookies);
+    const { name, value } = sessionCookie;
+    const cookie = { [name]: value };
+
+    const responseDelete = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteUser', { id }),
+      cookies: cookie,
+    });
+
+    expect(responseDelete.statusCode).toBe(302);
 
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeUndefined();

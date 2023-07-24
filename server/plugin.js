@@ -10,6 +10,7 @@ import fs from 'fs';
 import fastifyStatic from '@fastify/static';
 // NOTE: не поддердивает fastify 4.x
 // import fastifyErrorPage from 'fastify-error-page';
+import fastifyAuth from '@fastify/auth';
 import fastifyView from '@fastify/view';
 import fastifyFormbody from '@fastify/formbody';
 import fastifySecureSession from '@fastify/secure-session';
@@ -30,6 +31,7 @@ import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+import encrypt from './lib/secure.cjs';
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
@@ -85,6 +87,7 @@ const addHooks = (app) => {
 };
 
 const registerPlugins = async (app) => {
+  await app.register(fastifyAuth);
   await app.register(fastifySensible);
   // await app.register(fastifyErrorPage);
   await app.register(fastifyReverseRoutes);
@@ -115,11 +118,12 @@ const registerPlugins = async (app) => {
 
   app.decorate('checkEditAndDeletePermission', async (req, reply) => {
     const { id: paramsId } = req.params;
-    console.log(paramsId);
+    await console.log(encrypt(req.cookies.session));
 
     if (req.user?.id !== parseInt(paramsId, 10)) {
       req.flash('error', i18next.t('flash.users.authError'));
       reply.redirect(app.reverse('users'));
+      await console.log('ACCESS DENIED, InVALID ID');
     }
   })
 
