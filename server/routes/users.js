@@ -37,7 +37,7 @@ export default (app) => {
 
       return reply;
     })
-    .post('/users/:id', { name: 'updateUser' }, async (req, reply) => {
+    .post('/users/:id', { name: 'updateUser', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
       try {
         const { id } = req.params;
         const userToEdit = await app.objection.models.user.query().findById(id);
@@ -52,14 +52,11 @@ export default (app) => {
     })
     .delete('/users/:id', {
       name: 'deleteUser',
+      preValidation: app.checkEditAndDeletePermission,
     }, async (req, reply) => {
-      await console.log(req.user);
-      await console.log(req.session);
       try {
         const { id } = req.params;
         const user = await app.objection.models.user.query().findById(id);
-        await console.log(req.params, 'DELETE ROUTE LOG - PARAMS');
-        await console.log(user, '\n', 'DELETE ROUTE LOG - USER');
         await user.$query().delete();
         req.logout();
         req.flash('success', i18next.t('flash.users.delete.success'));

@@ -12,6 +12,7 @@ describe('test users CRUD', () => {
   let app;
   let knex;
   let models;
+  let cookie;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -27,11 +28,22 @@ describe('test users CRUD', () => {
     // тесты не должны зависеть друг от друга
     // перед каждым тестом выполняем миграции
     // и заполняем БД тестовыми данными
-    await knex.migrate.latest();
-    await prepareData(app);
   });
 
   beforeEach(async () => {
+    await knex.migrate.latest();
+    await prepareData(app);
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: testData.users.existing,
+      },
+    });
+
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    cookie = { [name]: value };
   });
 
   it('index', async () => {
@@ -71,17 +83,18 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
-  it('update', async () => {
-    const params = testData.users.existing;
-    const newParams = testData.users.toUpdate;
-    const user = await models.user.query().findOne({ email: params.email });
+  it('user update his profile', async () => {
+    const existingUser = testData.users.existing;
+    const params = testData.users.toUpdate;
+    const user = await models.user.query().findOne({ email: existingUser.email });
     const { id } = user;
     const response = await app.inject({
       method: 'POST',
       url: app.reverse('updateUser', { id }),
       payload: {
-        data: newParams,
+        data: params,
       },
+      cookies: cookie,
     });
 
     expect(response.statusCode).toBe(302);
@@ -89,34 +102,43 @@ describe('test users CRUD', () => {
     const updatedUser = await models.user.query().findById(id);
 
     const expected = {
-      ..._.omit(newParams, 'password'),
-      passwordDigest: encrypt(newParams.password),
+      ..._.omit(params, 'password'),
+      passwordDigest: encrypt(params.password),
     }
     expect(updatedUser).toMatchObject(expected);
   });
 
-  it('delete', async () => {
-    const userToDeleteData = testData.users.toDelete;
-    await console.log(userToDeleteData, 'to delete PARAMS');
-    const user = await models.user.query().findOne({ email: userToDeleteData.email });
-    const users = await models.user.query();
-    await console.log(users, 'DATABASE');
+  it('user can not update another user profile', async () => {
+    const anotherUserData = testData.users.anotherUser;
+    const params = testData.users.toUpdate;
+    const user = await models.user.query().findOne({ email: anotherUserData.email });
     const { id } = user;
-
-    const responseSignIn = await app.inject({
+    const response = await app.inject({
       method: 'POST',
-      url: app.reverse('session'),
+      url: app.reverse('updateUser', { id }),
       payload: {
-        data: userToDeleteData,
+        data: params,
       },
+      cookies: cookie,
     });
 
-    expect(responseSignIn.statusCode).toBe(200);
+    expect(response.statusCode).toBe(302);
 
-    const [sessionCookie] = responseSignIn.cookies;
-    await console.log(responseSignIn.cookies);
-    const { name, value } = sessionCookie;
-    const cookie = { [name]: value };
+    const updatedAnotherUser = await models.user.query().findById(id);
+
+    await console.log(updatedAnotherUser, user);
+
+    const expected = {
+      ..._.omit(anotherUserData, 'password'),
+      passwordDigest: anotherUserData.password,
+    };
+    expect(updatedAnotherUser).toMatchObject(expected);
+  });
+
+  it('user delete his profile', async () => {
+    const existingUserData = testData.users.existing;
+    const user = await models.user.query().findOne({ email: existingUserData.email });
+    const { id } = user;
 
     const responseDelete = await app.inject({
       method: 'DELETE',
@@ -124,16 +146,33 @@ describe('test users CRUD', () => {
       cookies: cookie,
     });
 
-    expect(responseDelete.statusCode).toBe(302);
+    expect(responseDelete.statusCode).toBe(302);    
 
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeUndefined();
+  });
+
+  it('check delete permission', async () => {
+    const existingUserData = testData.users.existing;
+    const user = await models.user.query().findOne({ email: existingUserData.email });
+    const { id } = user;
+
+    const responseDeleteWithoutCookies = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteUser', { id }),
+    });
+
+    expect(responseDeleteWithoutCookies.statusCode).toBe(302);    
+
+    const removedUser = await models.user.query().findById(id);
+    expect(removedUser).toBeDefined();
   });
 
   afterEach(async () => {
     // Пока Segmentation fault: 11
     // после каждого теста откатываем миграции
     // await knex.migrate.rollback();
+    await knex('users').truncate();
   });
 
   afterAll(async () => {

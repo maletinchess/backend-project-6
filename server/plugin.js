@@ -6,7 +6,6 @@ dotenv.config();
 
 import { fileURLToPath } from 'url';
 import path from 'path';
-import fs from 'fs';
 import fastifyStatic from '@fastify/static';
 // NOTE: не поддердивает fastify 4.x
 // import fastifyErrorPage from 'fastify-error-page';
@@ -31,7 +30,6 @@ import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
-import encrypt from './lib/secure.cjs';
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
@@ -68,7 +66,7 @@ const setUpStaticAssets = (app) => {
 const setupLocalization = async () => {
   await i18next
     .init({
-      lng: 'en',
+      lng: 'ru',
       fallbackLng: 'ru',
       // debug: isDevelopment,
       resources: {
@@ -118,12 +116,11 @@ const registerPlugins = async (app) => {
 
   app.decorate('checkEditAndDeletePermission', async (req, reply) => {
     const { id: paramsId } = req.params;
-    await console.log(encrypt(req.cookies.session));
+    const normalizedParamsId = parseInt(paramsId, 10);
 
-    if (req.user?.id !== parseInt(paramsId, 10)) {
+    if (req.user?.id !== normalizedParamsId) {
       req.flash('error', i18next.t('flash.users.authError'));
       reply.redirect(app.reverse('users'));
-      await console.log('ACCESS DENIED, InVALID ID');
     }
   })
 
