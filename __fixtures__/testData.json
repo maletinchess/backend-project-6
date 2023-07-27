@@ -16,5 +16,9 @@
       "email": "abcdefgh.kulas87@outlook.com",
       "password": "567uyicsszrre"
     }
+  },
+  "statuses": {
+    "new": "started",
+    "toUpdate": "done"
   }
 }
