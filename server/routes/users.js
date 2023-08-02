@@ -30,7 +30,6 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
       } catch (err) {
         const { data } = err;
-        await console.log(err);
         req.flash('error', i18next.t('flash.users.create.error'));
         reply.render('users/new', { user, errors: data });
       }

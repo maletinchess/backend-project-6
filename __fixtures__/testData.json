@@ -19,6 +19,7 @@
   },
   "statuses": {
     "new": "started",
-    "toUpdate": "done"
+    "toUpdate": "done",
+    "current": "process"
   }
 }

@@ -37,31 +37,61 @@ describe('test stattuses CRUD', () => {
   });
 
   it('statuses get new status page', async () => {
-    const params = testData.statuses.new;
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('getNewStatusPage'),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
     });
 
     expect(response.statusCode).toBe(200);
-
-    const status = await models.status.query().findOne({ name: params.name });
-    expect(status).toMatchObject(params);
   });
 
   it('create new status', async () => {
+    const params = testData.statuses.new;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('creteNewStatus'),
+      url: app.reverse('createNewStatus'),
       cookies: cookie,
     });
 
     expect(response.statusCode).toBe(302);
+
+    const createdSatus = await models.status.query().findOne({ name: params.name });
+    expect(createdSatus).toMatchObject(params);
   });
+
+  it('update status', async () => {
+    const params = testData.statuses.toUpdate;
+    const currentStatus = testData.statuses.current;
+    const { id } = await models.statuses.query().findOne({ name: currentStatus.name });
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('updateStatus', { id }),
+      payload: params,
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const updatedStatus = await models.status.query().findById(id);
+    expect(updatedStatus).toMatchObject(params);
+  });
+
+  it('delete status', async () => {
+    const currentStatus = testData.statuses.current;
+    const { id } = await models.statuses.query().findOne({ name: currentStatus.name });
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteStatus', { id }),
+      payload: params,
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const deletedUser = await models.status.query().findById(id);
+    expect(deletedUser).toBeUndefined();
+  })
 
   afterEach(async () => {
     await knex('statuses').truncate();

@@ -6,7 +6,6 @@ import fastify from 'fastify';
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData } from './helpers/index.js';
-import session from '../server/routes/session.js';
 
 describe('test users CRUD', () => {
   let app;
