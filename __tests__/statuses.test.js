@@ -5,7 +5,7 @@ import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData } from './helpers/index.js';
 
-describe('test stattuses CRUD', () => {
+describe('test statuses CRUD', () => {
   let app;
   let knex;
   let models;
@@ -50,6 +50,9 @@ describe('test stattuses CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: app.reverse('createNewStatus'),
+      payload: {
+        data: params,
+      },
       cookies: cookie,
     });
 
@@ -62,11 +65,13 @@ describe('test stattuses CRUD', () => {
   it('update status', async () => {
     const params = testData.statuses.toUpdate;
     const currentStatus = testData.statuses.current;
-    const { id } = await models.statuses.query().findOne({ name: currentStatus.name });
+    const { id } = await models.status.query().findOne({ name: currentStatus.name });
     const response = await app.inject({
       method: 'PATCH',
       url: app.reverse('updateStatus', { id }),
-      payload: params,
+      payload: {
+        data: params,
+      },
       cookies: cookie,
     });
 
@@ -78,12 +83,11 @@ describe('test stattuses CRUD', () => {
 
   it('delete status', async () => {
     const currentStatus = testData.statuses.current;
-    const { id } = await models.statuses.query().findOne({ name: currentStatus.name });
+    const { id } = await models.status.query().findOne({ name: currentStatus.name });
 
     const response = await app.inject({
       method: 'DELETE',
       url: app.reverse('deleteStatus', { id }),
-      payload: params,
       cookies: cookie,
     });
 

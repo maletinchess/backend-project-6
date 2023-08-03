@@ -7,7 +7,7 @@ export default (app) => {
       reply.render('statuses/index', { statuses });
       return reply;
     })
-    .get('/statuses/new', { name: 'newStatus' }, (req, reply) => {
+    .get('/statuses/new', { name: 'getNewStatusPage' }, (req, reply) => {
       const status = new app.objection.models.status();
       reply.render('statuses/new');
     })
@@ -17,7 +17,8 @@ export default (app) => {
       reply.render('statuses/edit', { statusToEdit });
       return reply;
     })
-    .post('/statuses', { name: 'newStatus' }, async (req, reply) => {
+    .post('/statuses', { name: 'createNewStatus' }, async (req, reply) => {
+      await console.log(req.body);
       const status = new app.objection.models.status();
       status.$set(req.body.data);
       try {

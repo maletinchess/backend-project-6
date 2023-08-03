@@ -18,8 +18,14 @@
     }
   },
   "statuses": {
-    "new": "started",
-    "toUpdate": "done",
-    "current": "process"
+    "new": {
+      "name": "started"
+    },
+    "toUpdate": {
+      "name": "done"
+    },
+    "current": {
+      "name": "process"
+    }
   }
 }
