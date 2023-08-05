@@ -4,6 +4,7 @@ export default (app) => {
   app
     .get('/statuses', { name: 'statuses' }, async (req, reply) => {
       const statuses = await app.objection.models.status.query();
+      await console.log(statuses);
       reply.render('statuses/index', { statuses });
       return reply;
     })
@@ -18,17 +19,19 @@ export default (app) => {
       return reply;
     })
     .post('/statuses', { name: 'createNewStatus' }, async (req, reply) => {
-      await console.log(req.body);
+      await console.log(req.body, 'POST!!!!!');
       const status = new app.objection.models.status();
       status.$set(req.body.data);
       try {
+        await console.log(req.body, 'POST');
         const validStatus = await app.objection.models.status.fromJson(req.body.data);
+        await console.log(validStatus, '!!!@@@@');
         await app.objection.models.status.query().insert(validStatus);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect(app.reverse('statuses'));
       }
       catch(err) {
-        await console.log(err);
+        await console.log(err, err.data.name[0]);
       }
     })
     .patch('/statuses/:id', { name: 'updateStatus' }, async (req, reply) => {
