@@ -2,23 +2,25 @@ import i18next from 'i18next';
 
 export default (app) => {
   app
-    .get('/statuses', { name: 'statuses' }, async (req, reply) => {
+    .get('/statuses', { name: 'statuses', preValidation: app.authenticate }, async (req, reply) => {
       const statuses = await app.objection.models.status.query();
       await console.log(statuses);
       reply.render('statuses/index', { statuses });
       return reply;
     })
-    .get('/statuses/new', { name: 'getNewStatusPage' }, (req, reply) => {
+    .get('/statuses/new', { name: 'getNewStatusPage', preValidation: app.authenticate }, (req, reply) => {
       const status = new app.objection.models.status();
       reply.render('statuses/new');
     })
-    .get('/statuses/:id/edit', { name: 'editStatus' }, (req, reply) => {
+    .get('/statuses/:id/edit', { name: 'editStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const statusToEdit = app.objection.models.status.query().findById(id);
+      await console.log(id);
+      const statusToEdit = await app.objection.models.status.query().findById(id);
+      await console.log(statusToEdit, 'STATUS');
       reply.render('statuses/edit', { statusToEdit });
       return reply;
     })
-    .post('/statuses', { name: 'createNewStatus' }, async (req, reply) => {
+    .post('/statuses', { name: 'createNewStatus', preValidation: app.authenticate }, async (req, reply) => {
       await console.log(req.body, 'POST!!!!!');
       const status = new app.objection.models.status();
       status.$set(req.body.data);
@@ -34,7 +36,7 @@ export default (app) => {
         await console.log(err, err.data.name[0]);
       }
     })
-    .patch('/statuses/:id', { name: 'updateStatus' }, async (req, reply) => {
+    .post('/statuses/:id', { name: 'updateStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
         const statusToEdit = await app.objection.models.status.query().findById(id);
@@ -47,7 +49,7 @@ export default (app) => {
         throw(err);
       }
     })
-    .delete('/statuses/:id', { name: 'deleteStatus' }, async (req, reply) => {
+    .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
         const statusToDelete = await app.objection.models.status.query().findById(id);

@@ -1,0 +1,9 @@
+extends ../layouts/application.pug
+
+block header
+  =t('views.statuses.editStatus.header')
+
+block content
+  +formFor()(action=route('updateStatus', { id: statusToEdit.id }) method='post')
+    +input(statusToEdit, 'name', errors)(type="text")
+    +submit(statusToEdit)(value=t('views.statuses.editStatus.submit'))

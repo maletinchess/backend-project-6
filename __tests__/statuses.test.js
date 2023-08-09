@@ -25,12 +25,26 @@ describe('test statuses CRUD', () => {
   beforeEach(async () => {
     await knex.migrate.latest();
     await prepareData(app);
+
+
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: testData.users.existing,
+      },
+    });
+
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    cookie = { [name]: value };
   });
 
   it('statuses get', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('statuses'),
+      cookies: cookie,
     });
   
     expect(response.statusCode).toBe(200);
@@ -40,6 +54,7 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('getNewStatusPage'),
+      cookies: cookie,
     });
 
     expect(response.statusCode).toBe(200);
@@ -67,7 +82,7 @@ describe('test statuses CRUD', () => {
     const currentStatus = testData.statuses.current;
     const { id } = await models.status.query().findOne({ name: currentStatus.name });
     const response = await app.inject({
-      method: 'PATCH',
+      method: 'POST',
       url: app.reverse('updateStatus', { id }),
       payload: {
         data: params,
