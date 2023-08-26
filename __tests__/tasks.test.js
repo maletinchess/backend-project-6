@@ -133,7 +133,7 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(302);
     const deletedTask = await models.task.query().findById(id);
     expect(deletedTask).toBeUndefined();
-  })
+  });
 
   afterEach(async () => {
     await knex('tasks').truncate();
