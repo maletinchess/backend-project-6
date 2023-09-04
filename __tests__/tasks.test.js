@@ -64,7 +64,9 @@ describe('test tasks CRUD', () => {
   });
 
   it('get task page', async () => {
-    const { id } = testData.tasks.exampleTask;
+    const current = testData.tasks.currentTask;
+    const { id } = await models.query().task.findOne({ name: current.name });
+
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('taskPage', { id }),
@@ -75,7 +77,9 @@ describe('test tasks CRUD', () => {
   });
 
   it('get edit-task page', async () => {
-    const { id } = testData.tasks.exampleTask;
+    const current = testData.tasks.currentTask;
+    const { id } = await models.query().task.findOne({ name: current.name });
+
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('taskPage', { id }),
@@ -103,7 +107,8 @@ describe('test tasks CRUD', () => {
   });
 
   it('update task', async () => {
-    const { id } = testData.tasks.current;
+    const current = testData.tasks.currentTask;
+    const { id } = await models.query().task.findOne({ name: current.name });
     const params = testData.tasks.toUpdate;
     const response = await app.inject({
       method: 'POST',
@@ -121,8 +126,8 @@ describe('test tasks CRUD', () => {
   });
 
   it('delete task', async () => {
-    const currentTask = testData.tasks.current;
-    const { id } = currentTask;
+    const current = testData.tasks.currentTask;
+    const { id } = await models.query().task.findOne({ name: current.name });
 
     const response = await app.inject({
       method: 'DELETE',
