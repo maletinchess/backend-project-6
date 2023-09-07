@@ -27,5 +27,19 @@
     "current": {
       "name": "process"
     }
+  },
+  "tasks": {
+    "new": {
+      "name": "frontend",
+      "creatorId": 1
+    },
+    "current": {
+      "name": "fix backend",
+      "creatorId": 2
+    },
+    "toUpdate": {
+      "name": "test front",
+      "creatorId": 2
+    }
   }
 }
