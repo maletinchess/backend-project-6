@@ -2,8 +2,6 @@
 
 import * as dotenv from 'dotenv';
 
-dotenv.config();
-
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fastifyStatic from '@fastify/static';
@@ -30,6 +28,8 @@ import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
 import models from './models/index.js';
 import FormStrategy from './lib/passportStrategies/FormStrategy.js';
+
+dotenv.config();
 
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
@@ -122,7 +122,7 @@ const registerPlugins = async (app) => {
       req.flash('error', i18next.t('flash.users.authError'));
       reply.redirect(app.reverse('users'));
     }
-  })
+  });
 
   await app.register(fastifyMethodOverride);
   await app.register(fastifyObjectionjs, {

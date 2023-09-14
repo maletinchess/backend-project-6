@@ -1,6 +1,5 @@
-const BaseModel = require('./BaseModel.cjs');
 const objectionUnique = require('objection-unique');
-const encrypt = require('../lib/secure.cjs');
+const BaseModel = require('./BaseModel.cjs');
 
 const unique = objectionUnique({ fields: ['email'] });
 
@@ -19,4 +18,4 @@ module.exports = class Status extends unique(BaseModel) {
       },
     };
   }
-}
+};

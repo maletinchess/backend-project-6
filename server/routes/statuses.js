@@ -9,7 +9,6 @@ export default (app) => {
       return reply;
     })
     .get('/statuses/new', { name: 'getNewStatusPage', preValidation: app.authenticate }, (req, reply) => {
-      const status = new app.objection.models.status();
       reply.render('statuses/new');
     })
     .get('/statuses/:id/edit', { name: 'editStatus', preValidation: app.authenticate }, async (req, reply) => {
@@ -31,8 +30,7 @@ export default (app) => {
         await app.objection.models.status.query().insert(validStatus);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect(app.reverse('statuses'));
-      }
-      catch(err) {
+      } catch (err) {
         await console.log(err, err.data.name[0]);
       }
     })
@@ -46,7 +44,7 @@ export default (app) => {
         return reply;
       } catch (err) {
         console.log(err);
-        throw(err);
+        throw (err);
       }
     })
     .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
@@ -58,7 +56,7 @@ export default (app) => {
         reply.redirect(app.reverse('statuses'));
         return reply;
       } catch {
-        throw(err);
+        throw (err);
       }
-    })
+    });
 };

@@ -26,7 +26,6 @@ describe('test statuses CRUD', () => {
     await knex.migrate.latest();
     await prepareData(app);
 
-
     const responseSignIn = await app.inject({
       method: 'POST',
       url: app.reverse('session'),
@@ -46,7 +45,7 @@ describe('test statuses CRUD', () => {
       url: app.reverse('statuses'),
       cookies: cookie,
     });
-  
+
     expect(response.statusCode).toBe(200);
   });
 
@@ -110,7 +109,7 @@ describe('test statuses CRUD', () => {
 
     const deletedUser = await models.status.query().findById(id);
     expect(deletedUser).toBeUndefined();
-  })
+  });
 
   afterEach(async () => {
     await knex('statuses').truncate();
