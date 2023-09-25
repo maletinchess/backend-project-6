@@ -1,0 +1,22 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('layouts.application.statuses')
+  a.btn.btn-primary.mx-2(href=route('newTask'))= t('views.tasks.createNewTaskButton')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.tasks.id')
+        th= t('views.tasks.name')
+        th= t('views.tasks.statusId')
+        th= t('views.tasks.creator')
+        th= t('views.tasks.executorId')
+        th= t('views.tasks.createdAt')
+        th= t('views.tasks.actions')
+    tbody
+      each task in tasks
+        tr
+          td= ytask.id
+          td
+            a(href=route('editTask', { id: task.id }))= task.name
+            

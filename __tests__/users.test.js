@@ -103,7 +103,7 @@ describe('test users CRUD', () => {
     const expected = {
       ..._.omit(params, 'password'),
       passwordDigest: encrypt(params.password),
-    }
+    };
     expect(updatedUser).toMatchObject(expected);
   });
 
@@ -145,7 +145,7 @@ describe('test users CRUD', () => {
       cookies: cookie,
     });
 
-    expect(responseDelete.statusCode).toBe(302);    
+    expect(responseDelete.statusCode).toBe(302);
 
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeUndefined();
@@ -161,7 +161,7 @@ describe('test users CRUD', () => {
       url: app.reverse('deleteUser', { id }),
     });
 
-    expect(responseDeleteWithoutCookies.statusCode).toBe(302);    
+    expect(responseDeleteWithoutCookies.statusCode).toBe(302);
 
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeDefined();

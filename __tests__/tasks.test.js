@@ -63,26 +63,13 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('get task page', async () => {
-    const current = testData.tasks.currentTask;
-    const { id } = await models.query().task.findOne({ name: current.name });
-
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('taskPage', { id }),
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
   it('get edit-task page', async () => {
-    const current = testData.tasks.currentTask;
-    const { id } = await models.query().task.findOne({ name: current.name });
+    const { current } = testData.tasks;
+    const { id } = await models.task.query().findOne({ name: current.name });
 
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('taskPage', { id }),
+      url: app.reverse('editTask', { id }),
       cookies: cookie,
     });
 
@@ -91,6 +78,7 @@ describe('test tasks CRUD', () => {
 
   it('create task', async () => {
     const params = testData.tasks.new;
+    await console.log(params);
     const response = await app.inject({
       method: 'POST',
       url: app.reverse('createTask'),
@@ -102,13 +90,14 @@ describe('test tasks CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const createdSatus = await models.task.query().findOne({ id: params.id });
-    expect(createdSatus).toMatchObject(params);
+    const createdTask = await models.task.query().findOne({ name: params.name });
+    await console.log(createdTask);
+    expect(createdTask).toMatchObject(params);
   });
 
   it('update task', async () => {
-    const current = testData.tasks.currentTask;
-    const { id } = await models.query().task.findOne({ name: current.name });
+    const { current } = testData.tasks;
+    const { id } = await models.task.query().findOne({ name: current.name });
     const params = testData.tasks.toUpdate;
     const response = await app.inject({
       method: 'POST',
@@ -126,8 +115,8 @@ describe('test tasks CRUD', () => {
   });
 
   it('delete task', async () => {
-    const current = testData.tasks.currentTask;
-    const { id } = await models.query().task.findOne({ name: current.name });
+    const { current } = testData.tasks;
+    const { id } = await models.task.query().findOne({ name: current.name });
 
     const response = await app.inject({
       method: 'DELETE',

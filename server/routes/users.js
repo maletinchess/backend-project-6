@@ -45,10 +45,10 @@ export default (app) => {
         req.flash('success', i18next.t('flash.users.edit.success'));
         reply.redirect(app.reverse('users'));
         return reply;
-      }
-      catch(err) {
+      } catch (err) {
+        console.log(err);
         throw err;
-      };
+      }
     })
     .delete('/users/:id', {
       name: 'deleteUser',
@@ -57,13 +57,17 @@ export default (app) => {
       try {
         const { id } = req.params;
         const user = await app.objection.models.user.query().findById(id);
+        const usersTasks = await user.$relatedQuery('tasks');
+        if (usersTasks.length !== 0) {
+          req.flash('error', i18next.t('flash.users.delete.error'));
+        }
         await user.$query().delete();
         req.logout();
         req.flash('success', i18next.t('flash.users.delete.success'));
         reply.redirect(app.reverse('users'));
         return reply;
-      }
-      catch(err) {
+      } catch (err) {
+        console.log(err);
         throw err;
       }
     });
