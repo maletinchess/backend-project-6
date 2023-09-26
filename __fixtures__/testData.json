@@ -30,16 +30,13 @@
   },
   "tasks": {
     "new": {
-      "name": "frontend",
-      "creatorId": 5
+      "name": "task1"
     },
     "current": {
-      "name": "fix backend",
-      "creatorId": 2
+      "name": "task2"
     },
     "toUpdate": {
-      "name": "test front",
-      "creatorId": 2
+      "name": "task3"
     }
   }
 }

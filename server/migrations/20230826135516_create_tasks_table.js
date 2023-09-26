@@ -4,6 +4,7 @@ export const up = (knex) => (
       table.string('name');
       table.integer('creatorId').references('id').inTable('users');
       table.integer('statusId').references('id').inTable('statuses');
+      table.integer('executorId').references('id').inTable('users');
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
     })

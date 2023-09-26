@@ -91,7 +91,8 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(302);
 
     const createdTask = await models.task.query().findOne({ name: params.name });
-    await console.log(createdTask);
+    const tasks = await app.objection.models.task.query();
+    await console.log(tasks);
     expect(createdTask).toMatchObject(params);
   });
 

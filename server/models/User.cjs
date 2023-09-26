@@ -1,7 +1,10 @@
 // @ts-check
 
-const BaseModel = require('./BaseModel.cjs');
+const path = require('path');
+
 const objectionUnique = require('objection-unique');
+const BaseModel = require('./BaseModel.cjs');
+
 const encrypt = require('../lib/secure.cjs');
 
 const unique = objectionUnique({ fields: ['email'] });
@@ -25,6 +28,19 @@ module.exports = class User extends unique(BaseModel) {
     };
   }
 
+  static get relationMappings() {
+    return {
+      tasks: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: path.join(__dirname, 'Task'),
+        join: {
+          from: 'users.id',
+          to: 'tasks.creatorId',
+        },
+      },
+    };
+  }
+
   set password(value) {
     this.passwordDigest = encrypt(value);
   }
@@ -32,4 +48,4 @@ module.exports = class User extends unique(BaseModel) {
   verifyPassword(password) {
     return encrypt(password) === this.passwordDigest;
   }
-}
+};
