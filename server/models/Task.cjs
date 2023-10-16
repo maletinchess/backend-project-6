@@ -29,7 +29,7 @@ module.exports = class Task extends unique(BaseModel) {
     return {
       creator: {
         relation: BaseModel.BelongsToOneRelation,
-        modelClass: path.join(__dirname, 'User'),
+        modelClass: path.join(__dirname, 'User.cjs'),
         join: {
           from: 'tasks.creatorId',
           to: 'users.id',
@@ -37,7 +37,7 @@ module.exports = class Task extends unique(BaseModel) {
       },
       executor: {
         relation: BaseModel.BelongsToOneRelation,
-        modelClass: path.join(__dirname, 'User'),
+        modelClass: path.join(__dirname, 'User.cjs'),
         join: {
           from: 'tasks.executorId',
           to: 'users.id',
@@ -45,7 +45,7 @@ module.exports = class Task extends unique(BaseModel) {
       },
       status: {
         relation: BaseModel.BelongsToOneRelation,
-        modelClass: path.join(__dirname, 'Status'),
+        modelClass: path.join(__dirname, 'Status.cjs'),
         join: {
           from: 'tasks.statusId',
           to: 'statuses.id',

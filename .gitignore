@@ -5,6 +5,5 @@ build/
 dist/
 tmp/
 temp/
-database.sqlite
 .env
 db_dev.sqlite

@@ -27,3 +27,23 @@ mixin buttonTo(action, method)
   form(action=action, method="post")
     input(name="_method" type="hidden" value=method)
     input(type='submit')&attributes(attributes)
+
+mixin select(entity, propertyName, errors = {}, items)
+  - propertyErrors = _.get(errors, propertyName)
+  - classLine = 'form-control' + (!propertyErrors ? '' : ' is-invalid')
+  - inputId = getInputId(propertyName)
+  - name = getInputName(propertyName)
+  - selectedOptions = entity[propertyName] ? [entity[propertyName]].flat().map((item) => item.id ? Number(item.id) : Number(item)) : []
+  .form-group
+    label(for=inputId)= t(`views.${propertyName}`)
+    select.form-control(
+        id= inputId,
+        name=name,
+        class=classLine
+      )
+      option
+      each item in items
+        - isSelect = _.includes(selectedOptions, item.id)
+        option(value=item.id selected= isSelect)= item.name
+    if !_.isEmpty(propertyErrors)
+      .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')

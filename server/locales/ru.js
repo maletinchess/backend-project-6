@@ -35,9 +35,9 @@ export default {
         },
         delete: {
           success: 'Статус успешно удалён',
-        }
+        },
       },
-      authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.'
+      authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
     },
     layouts: {
       application: {
@@ -46,6 +46,7 @@ export default {
         signUp: 'Регистрация',
         signOut: 'Выход',
         statuses: 'Статусы',
+        tasks: 'Задачи',
       },
     },
     views: {
@@ -91,14 +92,14 @@ export default {
         },
         editStatus: {
           submit: 'Изменить статус',
-          header: 'Изменение статуса'
+          header: 'Изменение статуса',
         },
         createNewStatusSubmitButton: 'Создать статус',
         actions: {
           delete: 'Удалить',
           edit: 'Изменить',
         },
-      }
+      },
     },
   },
 };

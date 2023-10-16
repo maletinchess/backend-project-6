@@ -16,7 +16,6 @@ export default (app) => {
     .get('/users/:id/edit', { name: 'editUser', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
       const { id } = req.params;
       const userToEdit = await app.objection.models.user.query().findById(id);
-      await console.log(userToEdit);
       reply.render('users/edit', { userToEdit });
       return reply;
     })
