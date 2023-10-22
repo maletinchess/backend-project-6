@@ -38,5 +38,16 @@
     "toUpdate": {
       "name": "task3"
     }
+  },
+  "labels": {
+    "new": {
+      "name": "documentation"
+    },
+    "current": {
+      "name": "question"
+    },
+    "toUpdate": {
+      "name": "bug"
+    }
   }
 }

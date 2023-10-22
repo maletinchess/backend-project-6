@@ -1,1 +1,32 @@
 extends ../layouts/application.pug
+
+block content
+  .card
+  .card-header
+    h2= task.name
+  .card-body.bg-light
+    p= task.description
+    hr
+    .container
+      .row.p-1
+        .col= t('views.tasks.creator')
+        .col= `${task.creator.firstName}`
+      .row.p-1
+        .col= t('views.tasks.executorId')
+        if task.executor
+          .col= `${task.executor.firstName}`
+        else
+          .col
+      .row.p-1
+        .col= t('views.tasks.statusId')
+        .col= task.status.name
+      .row.p-1
+        .col= t('views.tasks.createdAt')
+        .col= formatDate(task.createdAt)
+      .row.p-1
+        .col
+          ul.nav
+              li
+                a.btn.btn-primary.mx-2(href=route('editTask', { id: task.id }))= t('views.tasks.actions.edit')
+              li
+                +buttonTo(route('deleteTask', { id: task.id }), 'delete')(class="btn btn-danger" value=t('views.tasks.actions.delete'))

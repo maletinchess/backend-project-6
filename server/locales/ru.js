@@ -38,6 +38,17 @@ export default {
         },
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
+      tasks: {
+        create: {
+          success: 'Задача успешно создана',
+        },
+        update: {
+          success: 'Задача успешно изменена',
+        },
+        delete: {
+          success: 'Задача успешно удалена',
+        },
+      },
     },
     layouts: {
       application: {
@@ -99,6 +110,31 @@ export default {
           delete: 'Удалить',
           edit: 'Изменить',
         },
+      },
+      tasks: {
+        createNewTaskButton: 'Создать задачу',
+        id: 'ID',
+        name: 'Наименование',
+        status: 'Статус',
+        creator: 'Автор',
+        executor: 'Исполнитель',
+        createdAt: 'Дата создания',
+        actions: {
+          header: 'Действия',
+          edit: 'Изменить',
+          delete: 'Удалить',
+        },
+        editTask: {
+          submit: 'Изменить',
+          title: 'Изменение задачи',
+        },
+        newTask: {
+          title: 'Создание задачи',
+          submit: 'Создать',
+        },
+        executorId: 'Исполнитель',
+        statusId: 'Статус',
+        description: 'описание задачи',
       },
     },
   },

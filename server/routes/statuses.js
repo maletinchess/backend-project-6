@@ -20,13 +20,10 @@ export default (app) => {
       return reply;
     })
     .post('/statuses', { name: 'createNewStatus', preValidation: app.authenticate }, async (req, reply) => {
-      await console.log(req.body, 'POST!!!!!');
       const status = new app.objection.models.status();
       status.$set(req.body.data);
       try {
-        await console.log(req.body, 'POST');
         const validStatus = await app.objection.models.status.fromJson(req.body.data);
-        await console.log(validStatus, '!!!@@@@');
         await app.objection.models.status.query().insert(validStatus);
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect(app.reverse('statuses'));

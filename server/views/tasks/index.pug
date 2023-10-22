@@ -12,17 +12,17 @@ block content
         th= t('views.tasks.creator')
         th= t('views.tasks.executor')
         th= t('views.tasks.createdAt')
-        th= t('views.tasks.actions')
+        th= t('views.tasks.actions.header')
     tbody
       each task in tasks
         tr
           td= task.id
           td
-            a(href=route('editTask', { id: task.id }))= task.name
+            a(href=route('showTask', { id: task.id }))= task.name
           td= task.status.name
-          td= task.creator.name
+          td= task.creator.firstName
           if task.executor
-            td= `${task.executor.name}`
+            td= `${task.executor.firstName}`
           else
             td
           td= task.createdAt
