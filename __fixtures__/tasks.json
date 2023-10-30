@@ -8,6 +8,11 @@
   {
     "name": "task3",
     "creatorId": 2,
+    "statusId": 3
+  },
+  {
+    "name": "task4",
+    "creatorId": 2,
     "statusId": 2
   }
 ]

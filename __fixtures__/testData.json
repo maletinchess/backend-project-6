@@ -30,24 +30,40 @@
   },
   "tasks": {
     "new": {
-      "name": "task1"
+      "name": "task1",
+      "statusId": 1
     },
     "current": {
       "name": "task2"
     },
     "toUpdate": {
-      "name": "task3"
+      "name": "task3",
+      "statusId": 2,
+      "description": "Now task has description"
+    },
+    "withLabel": {
+      "name": "task5",
+      "labels": [{ "id": 3, "name": "label4" }],
+      "statusId": 1
+    },
+    "toUpdateLabels": {
+      "name": "task6",
+      "statusId": 3,
+      "labels": [{ "id": 1, "name": "label1"}, {"id": 2, "name": "label2"}]
     }
   },
   "labels": {
     "new": {
-      "name": "documentation"
+      "name": "label3"
     },
     "current": {
-      "name": "question"
+      "name": "label1"
     },
     "toUpdate": {
-      "name": "bug"
+      "name": "label2"
+    },
+    "binded": {
+      "name": "label4"
     }
   }
 }

@@ -2,9 +2,9 @@ const path = require('path');
 
 const BaseModel = require('./BaseModel.cjs');
 
-module.exports = class Task extends (BaseModel) {
+module.exports = class Label extends (BaseModel) {
   static get tableName() {
-    return 'tasks';
+    return 'labels';
   }
 
   static get jsonSchema() {
@@ -23,12 +23,12 @@ module.exports = class Task extends (BaseModel) {
     return {
       tasks: {
         relation: BaseModel.ManyToManyRelation,
-        modelClass: path.join(__dirname, 'Task'),
+        modelClass: path.join(__dirname, 'Task.cjs'),
         join: {
           from: 'labels.id',
           through: {
-            from: 'tasks_labels.labelId',
-            to: 'tasks_labels.taskId',
+            from: 'labels_tasks.labelId',
+            to: 'labels_tasks.taskId',
           },
           to: 'tasks.id',
         },

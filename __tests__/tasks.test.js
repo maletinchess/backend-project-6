@@ -90,17 +90,38 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(302);
 
     const createdTask = await models.task.query().findOne({ name: params.name });
-    const tasks = await app.objection.models.task.query();
-    await console.log(tasks);
     expect(createdTask).toMatchObject(params);
   });
 
-  it('update task', async () => {
-    const { current } = testData.tasks;
-    const { id } = await models.task.query().findOne({ name: current.name });
-    const params = testData.tasks.toUpdate;
+  it('create task with label', async () => {
+    const params = testData.tasks.withLabel;
+    await console.log(params);
     const response = await app.inject({
       method: 'POST',
+      url: app.reverse('createTask'),
+      payload: {
+        data: params,
+      },
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const createdTask = await models.task.query().findOne({ name: params.name });
+    await console.log(createdTask);
+    const bindedLabels = await createdTask.$relatedQuery('labels');
+    await console.log(bindedLabels);
+    expect(bindedLabels.length).toBeGreaterThan(0);
+  });
+
+  it('update task - status, description, name', async () => {
+    const { current } = testData.tasks;
+    const taskBeforeUpdate = await models.task.query().findOne({ name: current.name });
+    await console.log(taskBeforeUpdate);
+    const { id } = taskBeforeUpdate;
+    const params = testData.tasks.toUpdate;
+    const response = await app.inject({
+      method: 'PATCH',
       url: app.reverse('updateTask', { id }),
       payload: {
         data: params,
@@ -111,6 +132,29 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(302);
 
     const updatedTask = await models.task.query().findById(id);
+    await console.log(updatedTask);
+    expect(updatedTask).toMatchObject(params);
+  });
+
+  it('update task - labels', async () => {
+    const { current } = testData.tasks;
+    const taskBeforeUpdate = await models.task.query().findOne({ name: current.name });
+    await console.log(taskBeforeUpdate);
+    const { id } = taskBeforeUpdate;
+    const params = testData.tasks.toUpdate;
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('updateTask', { id }),
+      payload: {
+        data: params,
+      },
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const updatedTask = await models.task.query().findById(id);
+    await console.log(updatedTask);
     expect(updatedTask).toMatchObject(params);
   });
 

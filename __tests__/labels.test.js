@@ -60,6 +60,8 @@ describe('test labels CRUD', () => {
 
   it('get edit label page', async () => {
     const { current } = testData.labels;
+    const labels = await models.label.query();
+    await console.log(labels);
     const { id } = await models.label.query().findOne({ name: current.name });
 
     const response = await app.inject({
@@ -72,7 +74,8 @@ describe('test labels CRUD', () => {
   });
 
   it('create label', async () => {
-    const params = testData.tasks.new;
+    const params = testData.labels.new;
+    await console.log(params);
     const response = await app.inject({
       method: 'POST',
       url: app.reverse('createLabel'),
@@ -85,6 +88,7 @@ describe('test labels CRUD', () => {
     expect(response.statusCode).toBe(302);
 
     const createdLabel = await models.label.query().findOne({ name: params.name });
+    await console.log(createdLabel);
     expect(createdLabel).toMatchObject(params);
   });
 
@@ -121,6 +125,13 @@ describe('test labels CRUD', () => {
     expect(response.statusCode).toBe(302);
     const deletedLabel = await models.label.query().findById(id);
     expect(deletedLabel).toBeUndefined();
+  });
+
+  it('label binded with task', async () => {
+    const { binded } = testData.labels;
+    const bindedLabel = await models.label.query().findOne({ name: binded.name });
+    const tasks = await bindedLabel.$relatedQuery('tasks');
+    expect(tasks.length > 0).toBeTruthy();
   });
 
   afterEach(async () => {

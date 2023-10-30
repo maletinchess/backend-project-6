@@ -13,7 +13,7 @@ module.exports = class Task extends unique(BaseModel) {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['name', 'creatorId'],
+      required: ['name', 'creatorId', 'statusId'],
       properties: {
         id: { type: 'integer' },
         name: { type: 'string', minLength: 1 },
@@ -51,14 +51,14 @@ module.exports = class Task extends unique(BaseModel) {
           to: 'statuses.id',
         },
       },
-      label: {
+      labels: {
         relation: BaseModel.ManyToManyRelation,
         modelClass: path.join(__dirname, 'Label.cjs'),
         join: {
           from: 'tasks.id',
           through: {
-            from: 'tasks_labels.taskId',
-            to: 'tasks_labels.labelId',
+            from: 'labels_tasks.taskId',
+            to: 'labels_tasks.labelId',
           },
           to: 'labels.id',
         },

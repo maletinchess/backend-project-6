@@ -1,8 +1,11 @@
 [
   {
-    "name": "bug"
+    "name": "label1"
   },
   {
-    "name": "question"
+    "name": "label2"
+  },
+  {
+    "name": "label4"
   }
 ]
