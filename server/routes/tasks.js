@@ -1,15 +1,43 @@
 import i18next from 'i18next';
+import _ from 'lodash';
 
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
-      const tasks = await app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
-      const statuses = await app.objection.models.status.query();
-      const users = await app.objection.models.user.query();
-      const labels = await app.objection.models.label.query();
+      const { query, user: { id } } = req;
+      const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
+
+      if (query.executor) {
+        tasksQuery.modify('filterExecutor', query.executor);
+      }
+
+      if (query.status) {
+        tasksQuery.modify('filterStatus', query.status);
+      }
+
+      if (query.label) {
+        tasksQuery.modify('filterLabel', query.label);
+      }
+
+      if (query.isCreatorUser) {
+        tasksQuery.modify('filterCreator', id);
+      }
+
+      const [tasks, users, statuses, labels] = await Promise.all([
+        tasksQuery,
+        app.objection.models.user.query(),
+        app.objection.models.status.query(),
+        app.objection.models.label.query(),
+      ]);
+
+      const task = await new app.objection.models.task();
+
+      const usersNormalized = users.map((user) => ({ ...user, name: user.firstName }));
+
       reply.render('tasks/index', {
-        tasks, users, statuses, labels,
+        tasks, usersNormalized, statuses, labels, task, query,
       });
+
       return reply;
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
@@ -46,41 +74,84 @@ export default (app) => {
       return reply;
     })
     .post('/tasks', { name: 'createTask', preValidation: app.authenticate }, async (req, reply) => {
-      const { statusId } = req.body.data;
+      const { statusId, labels, executorId } = req.body.data;
       await console.log(req.body.data, 'CREATE TASK DATA');
 
+      const normalizeLabels = (l) => {
+        if (!l) {
+          return [];
+        }
+        if (typeof (l) === 'string' || typeof (l) === 'number') {
+          return [l].map((id) => ({ id: parseInt(id, 10) }));
+        }
+
+        return l.map((id) => ({ id: parseInt(id, 10) }));
+      };
+
+      const labelsNormalized = normalizeLabels(labels);
+
+      const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : 0;
+
+      const graph = {
+        ...req.body.data,
+        creatorId: parseInt(req.user.id, 10),
+        statusId: parseInt(statusId, 10),
+        executorId: executorIdNormalized,
+      };
+
       try {
-        const validTask = await app.objection.models.task.fromJson(
-          {
-            ...req.body.data,
-            creatorId: parseInt(req.user.id, 10),
-            statusId: parseInt(statusId, 10),
-          },
-        );
+        const validTask = await app.objection.models.task.fromJson(graph);
         await app.objection.models.task.transaction(async (trx) => {
           await app.objection.models.task
             .query(trx)
-            .insertGraph([{ ...validTask }], {
+            .insertGraph([{ ...validTask, labels: labelsNormalized }], {
               relate: ['labels'],
             });
         });
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
       } catch (e) {
-        await console.log(e);
+        await console.log(e, 'ERROR');
       }
     })
     .patch('/tasks/:id', { name: 'updateTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      const { statusId } = req.body.data;
+      const { statusId, executorId, labels } = req.body.data;
+      await console.log(req.body.data, 'REQ BODY DATA: UPDATE TASK');
+
+      const normalizeLabels = (l) => {
+        if (!l) {
+          return [];
+        }
+        if (typeof (l) === 'string' || typeof (l) === 'number') {
+          return [l].map((i) => ({ id: parseInt(i, 10) }));
+        }
+
+        return l.map((i) => ({ id: parseInt(i, 10) }));
+      };
+
+      const labelsNormalized = normalizeLabels(labels);
+
+      const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : 0;
+
+      const graph = {
+        ...req.body.data,
+        statusId: parseInt(statusId, 10),
+        executorId: executorIdNormalized,
+        labels: labelsNormalized,
+        id: parseInt(id, 10),
+      };
+
       try {
-        const taskToEdit = await app.objection.models.task.query().findById(id);
-        await taskToEdit.$query().patch(
-          {
-            ...req.body.data,
-            statusId: parseInt(statusId, 10),
-          },
-        );
+        await app.objection.models.task.transaction(async (trx) => {
+          await app.objection.models.task.query(trx).upsertGraph(
+            { ...graph },
+            {
+              relate: true,
+              unrelate: true,
+            },
+          );
+        });
         req.flash('info', i18next.t('flash.tasks.update.success'));
         reply.redirect(app.reverse('tasks'));
         return reply;
@@ -89,13 +160,19 @@ export default (app) => {
       }
     })
     .delete('/tasks/:id', { name: 'deleteTask', preValidation: app.authenticate }, async (req, reply) => {
-      const { id } = req.params;
       try {
-        const taskToDelete = await app.objection.models.task.query().findById(id);
-        await taskToDelete.$query().delete();
-        req.flash('info', i18next.t('flash.tasks.delete.success'));
-        reply.redirect(app.reverse('tasks'));
-        return reply;
+        const { id } = req.params;
+        const { creatorId } = await app.objection.models.task.query().findById(id);
+        if (req.user.id !== creatorId) {
+          req.flash('error', i18next.t('flash.tasks.delete.authError'));
+          reply.redirect('/tasks');
+        } else {
+          const taskToDelete = await app.objection.models.task.query().findById(id);
+          await taskToDelete.$query().delete();
+          req.flash('info', i18next.t('flash.tasks.delete.success'));
+          reply.redirect(app.reverse('tasks'));
+          return reply;
+        }
       } catch (err) {
         await console.log(err);
         throw (err);

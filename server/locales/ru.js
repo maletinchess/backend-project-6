@@ -47,6 +47,19 @@ export default {
         },
         delete: {
           success: 'Задача успешно удалена',
+          authError: 'Доступ запрещён! Удалять задачи может только создатель.',
+        },
+      },
+      labels: {
+        create: {
+          success: 'Метка успешно создана',
+        },
+        update: {
+          success: 'Метка успешно изменена',
+        },
+        delete: {
+          success: 'Метка успешно удалена',
+          error: 'Если метка связана с задачей, её нельзя удалить',
         },
       },
     },
@@ -58,6 +71,7 @@ export default {
         signOut: 'Выход',
         statuses: 'Статусы',
         tasks: 'Задачи',
+        labels: 'Метки',
       },
     },
     views: {
@@ -132,9 +146,37 @@ export default {
           title: 'Создание задачи',
           submit: 'Создать',
         },
+        labels: 'Метки',
         executorId: 'Исполнитель',
         statusId: 'Статус',
         description: 'описание задачи',
+        filter: {
+          status: 'Статус',
+          executor: 'Исполнитель',
+          label: 'Метки',
+          submit: 'Показать',
+          checkbox: 'Только мои задачи',
+        },
+
+      },
+      labels: {
+        createNewLabelButton: 'Создать Метки',
+        id: 'ID',
+        name: 'Наименование',
+        createdAt: 'Дата создания',
+        newLabel: {
+          header: 'Создание Метки',
+          submit: 'Создать',
+        },
+        editLabel: {
+          title: 'Изменение Метки',
+          submit: 'Изменить',
+        },
+        actions: {
+          header: 'Действия',
+          edit: 'Изменить',
+          delete: 'Удалить',
+        },
       },
     },
   },

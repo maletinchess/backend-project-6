@@ -36,6 +36,9 @@
     "current": {
       "name": "task2"
     },
+    "taskToDelete": {
+      "name": "task4"
+    },
     "toUpdate": {
       "name": "task3",
       "statusId": 2,
@@ -43,13 +46,13 @@
     },
     "withLabel": {
       "name": "task5",
-      "labels": [{ "id": 3, "name": "label4" }],
+      "labels": 1,
       "statusId": 1
     },
     "toUpdateLabels": {
       "name": "task6",
       "statusId": 3,
-      "labels": [{ "id": 1, "name": "label1"}, {"id": 2, "name": "label2"}]
+      "labels": [1, 2]
     }
   },
   "labels": {

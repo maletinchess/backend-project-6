@@ -14,8 +14,8 @@ export default (app) => {
       return reply;
     })
     .get('/labels/:id/edit', { name: 'editLabel', preValidation: app.authenticate }, async (req, reply) => {
-      const label = await app.objection.models.label.query().findById(req.params.id);
-      reply.render('labels/edit', { label });
+      const labelToEdit = await app.objection.models.label.query().findById(req.params.id);
+      reply.render('labels/edit', { labelToEdit });
       return reply;
     })
     .post('/labels', { name: 'createLabel', preValidation: app.authenticate }, async (req, reply) => {

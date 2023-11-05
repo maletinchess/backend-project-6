@@ -2,7 +2,6 @@ import _ from 'lodash';
 import fastify from 'fastify';
 
 import init from '../server/plugin.js';
-import encrypt from '../server/lib/secure.cjs';
 import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
@@ -158,9 +157,24 @@ describe('test tasks CRUD', () => {
     expect(updatedTask).toMatchObject(params);
   });
 
-  it('delete task', async () => {
+  it('user can not delete task with anotother creator', async () => {
     const { current } = testData.tasks;
     const { id } = await models.task.query().findOne({ name: current.name });
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteTask', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+    const deletedTask = await models.task.query().findById(id);
+    expect(deletedTask).toBeDefined();
+  });
+
+  it('user can delete task if he is creator', async () => {
+    const { taskToDelete } = testData.tasks;
+    const { id } = await models.task.query().findOne({ name: taskToDelete.name });
 
     const response = await app.inject({
       method: 'DELETE',

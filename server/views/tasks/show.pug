@@ -25,6 +25,12 @@ block content
         .col= formatDate(task.createdAt)
       .row.p-1
         .col
+          h6= t('views.tasks.labels')
+          ul
+            each label in task.labels
+              li= label.name
+      .row.p-1
+        .col
           ul.nav
               li
                 a.btn.btn-primary.mx-2(href=route('editTask', { id: task.id }))= t('views.tasks.actions.edit')

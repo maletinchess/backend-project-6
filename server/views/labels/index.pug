@@ -1,0 +1,23 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('layouts.application.labels')
+  a.btn.btn-primary.mx-2(href=route('newLabel'))= t('views.labels.createNewLabelButton')
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.labels.id')
+        th= t('views.labels.name')
+        th= t('views.labels.createdAt')
+    tbody
+      each label in labels
+        tr
+          td= label.id
+          td= label.name
+          td= label.createdAt
+          td
+            ul.nav
+              li
+                a.btn.btn-primary.mx-2(href=route('editLabel', { id: label.id }))= t('views.labels.actions.edit')
+              li
+                +buttonTo(route('deleteLabel', { id: label.id }), 'delete')(class="btn btn-danger" value=t('views.labels.actions.delete'))

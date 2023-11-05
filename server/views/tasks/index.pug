@@ -3,6 +3,13 @@ extends ../layouts/application.pug
 block content
   h1= t('layouts.application.tasks')
   a.btn.btn-primary.mx-2(href=route('newTask'))= t('views.tasks.createNewTaskButton')
+  .jumbotron.p-2
+    +formFor()(action=route('tasks') method='get' class="form-inline")
+      +filterSelect('task', 'status', statuses)
+      +filterSelect('task', 'executor', usersNormalized)
+      +filterSelect('task', 'label', labels)
+      +checkbox('task','isCreatorUser')
+      +submit()(value=t('views.tasks.filter.submit'))
   table.table.table-striped
     thead
       tr

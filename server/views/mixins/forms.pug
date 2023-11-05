@@ -31,7 +31,7 @@ mixin buttonTo(action, method)
 mixin textarea(entity, propertyName, errors = {})
   .form-group(class=(errors[propertyName] && 'has-danger'))
 
-mixin select(entity, propertyName, errors = {}, items)
+mixin select(entity, propertyName, errors = {}, items, multiple = false)
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (!propertyErrors ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
@@ -42,6 +42,7 @@ mixin select(entity, propertyName, errors = {}, items)
     select.form-control(
         id= inputId,
         name=name,
+        multiple=multiple,
         class=classLine
       )
       option
@@ -68,3 +69,20 @@ mixin textarea(entity, propertyName, errors = {})
     )&attributes(attributes) #{value}
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
+
+mixin filterSelect(entityName, propertyName, items)
+  - inputId = getInputId(propertyName)
+  - isSelected = (item) => item.id == query[propertyName]
+  .form-group
+    label(for=inputId)= t(`views.${entityName}s.filter.${propertyName}`)
+      select.form-control(id=inputId name=propertyName)
+        option
+        each item in items
+          option(value = item.id selected=isSelected(item))= item.name 
+
+mixin checkbox(entityName, propertyName)
+  - inputId = getInputId(propertyName)
+  - name = getInputName(propertyName)
+  .form-group.form-check
+    input.form-check-input(id=inputId type='checkbox', name=propertyName, checked=(!!query[propertyName]))
+    label.form-check-label(for-=inputId)= t(`views.${entityName}s.filter.checkbox`)
