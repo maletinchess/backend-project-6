@@ -45,8 +45,6 @@ const rollbar = new Rollbar({
   captureUnhandledRejections: true,
 });
 
-rollbar.log('Hello world!');
-
 const setUpViews = (app) => {
   const helpers = getHelpers(app);
   app.register(fastifyView, {
@@ -172,6 +170,7 @@ export default async (app, _options) => {
   addRoutes(app);
   addHooks(app);
   addErrorHandler(app);
+  rollbar.log('Hello world!');
 
   return app;
 };
