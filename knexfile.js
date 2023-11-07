@@ -30,7 +30,7 @@ export const test = {
 export const production = {
   client: 'sqlite3',
   connection: {
-    filename: './database.sqlite',
+    filename: path.join(__dirname, 'db_dev.sqlite'),
   },
   useNullAsDefault: true,
   migrations,

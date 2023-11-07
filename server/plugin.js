@@ -20,6 +20,8 @@ import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
 
+import Rollbar from 'rollbar';
+
 import ru from './locales/ru.js';
 import en from './locales/en.js';
 // @ts-ignore
@@ -34,7 +36,16 @@ dotenv.config();
 const __dirname = fileURLToPath(path.dirname(import.meta.url));
 
 const mode = process.env.NODE_ENV || 'development';
-// const isDevelopment = mode === 'development';
+const isDevelopment = mode === 'development';
+const isProduction = mode === 'production';
+
+const rollbar = new Rollbar({
+  accessToken: process.env.POST_SERVER_ITEM_ACCESS_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
+rollbar.log('Hello world!');
 
 const setUpViews = (app) => {
   const helpers = getHelpers(app);
@@ -68,7 +79,7 @@ const setupLocalization = async () => {
     .init({
       lng: 'ru',
       fallbackLng: 'ru',
-      // debug: isDevelopment,
+      debug: isDevelopment,
       resources: {
         ru,
         en,
@@ -139,6 +150,14 @@ const registerPlugins = async (app) => {
   });
 };
 
+const addErrorHandler = (app) => {
+  app.setErrorHandler((error, req, reply) => {
+    if (isProduction) {
+      rollbar.log(error);
+    }
+  });
+};
+
 export const options = {
   exposeHeadRoutes: false,
 };
@@ -152,6 +171,7 @@ export default async (app, _options) => {
   setUpStaticAssets(app);
   addRoutes(app);
   addHooks(app);
+  addErrorHandler(app);
 
   return app;
 };

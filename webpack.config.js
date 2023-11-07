@@ -15,7 +15,7 @@ export default {
       {
         test: /\.jpg/,
         type: 'asset/resource',
-      }
+      },
     ],
   },
   plugins: [new MiniCssExtractPlugin()],
