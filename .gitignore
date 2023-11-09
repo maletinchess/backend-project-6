@@ -6,4 +6,3 @@ dist/
 tmp/
 temp/
 .env
-db_dev.sqlite

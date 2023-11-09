@@ -22,6 +22,7 @@ export default (app) => {
     .post('/users', async (req, reply) => {
       const user = new app.objection.models.user();
       user.$set(req.body.data);
+      await console.log(user);
 
       try {
         const validUser = await app.objection.models.user.fromJson(req.body.data);
