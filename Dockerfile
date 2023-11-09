@@ -13,7 +13,7 @@ COPY package-lock.json .
 
 RUN npm ci
 
-COPY . .
+COPY /server/views/welcome/index.pug
 
 ENV NODE_ENV=production
 RUN make build
