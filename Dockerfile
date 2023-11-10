@@ -18,4 +18,4 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-CMD ["bash", "-c", "make db-migrate && npm start"]
+CMD ["bash", "-c", "make db-migrate && npm run start"]
