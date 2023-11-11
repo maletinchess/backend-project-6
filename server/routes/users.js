@@ -58,13 +58,14 @@ export default (app) => {
         const { id } = req.params;
         const user = await app.objection.models.user.query().findById(id);
         const userTasks = await user.$relatedQuery('tasks');
-        await console.log(userTasks);
+        await console.log(user, userTasks, 'TASKS AND USER LOG');
         if (userTasks.length !== 0) {
           req.flash('error', i18next.t('flash.users.delete.error'));
+        } else {
+          await user.$query().delete();
+          req.logout();
+          req.flash('success', i18next.t('flash.users.delete.success'));
         }
-        await user.$query().delete();
-        req.logout();
-        req.flash('success', i18next.t('flash.users.delete.success'));
         reply.redirect(app.reverse('users'));
         return reply;
       } catch (err) {
