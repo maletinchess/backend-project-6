@@ -30,6 +30,7 @@ export default (app) => {
         return reply;
       } catch (err) {
         await console.log(err, 'CREATE LABEL ERROR');
+        throw (err);
       }
     })
     .post('/labels/:id', { name: 'updateLabel', preValidation: app.authenticate }, async (req, reply) => {
@@ -47,10 +48,7 @@ export default (app) => {
       try {
         const { id } = req.params;
         const labelToDelete = await app.objection.models.label.query().findById(id);
-        await console.log(labelToDelete);
-        const tasks = await labelToDelete.$relatedQuery('tasks');
-        await console.log(tasks);
-        if (tasks.length !== 0) {
+        if (await app.checkIfEntityConnectedWithTask(labelToDelete)) {
           req.flash('error', i18next.t('flash.labels.delete.error'));
         } else {
           await labelToDelete.$query().delete();
@@ -60,6 +58,7 @@ export default (app) => {
         return reply;
       } catch (err) {
         await console.log(err);
+        throw (err);
       }
     });
 };

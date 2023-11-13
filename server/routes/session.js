@@ -13,7 +13,7 @@ export default (app) => {
         return app.httpErrors.internalServerError(err);
       }
       if (!user) {
-        const signInForm = {...req.body.data, password: ''};
+        const signInForm = { ...req.body.data, password: '' };
         const errors = {
           email: [{ message: i18next.t('flash.session.create.error') }],
         };

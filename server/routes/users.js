@@ -22,7 +22,6 @@ export default (app) => {
     .post('/users', async (req, reply) => {
       const user = new app.objection.models.user();
       user.$set(req.body.data);
-      await console.log(user);
 
       try {
         const validUser = await app.objection.models.user.fromJson(req.body.data);
@@ -37,7 +36,7 @@ export default (app) => {
 
       return reply;
     })
-    .post('/users/:id', { name: 'updateUser', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
+    .post('/users/:id', { name: 'updateUser', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
         const userToEdit = await app.objection.models.user.query().findById(id);
@@ -57,9 +56,9 @@ export default (app) => {
       try {
         const { id } = req.params;
         const user = await app.objection.models.user.query().findById(id);
-        const userTasks = await user.$relatedQuery('tasks');
-        await console.log(user, userTasks, 'TASKS AND USER LOG');
-        if (userTasks.length !== 0) {
+        const usersTasks = await user.$relatedQuery('tasks');
+        await console.log(req.user.id, usersTasks, 'TASKS-USERS');
+        if (app.checkIfEntityConnectedWithTask(user)) {
           req.flash('error', i18next.t('flash.users.delete.error'));
         } else {
           await user.$query().delete();

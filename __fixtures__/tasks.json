@@ -1,8 +1,8 @@
 [
   {
     "name": "task2",
-    "creatorId": 1,
-    "statusId": 1,
+    "creatorId": 2,
+    "statusId": 2,
     "executorId": 2
   },
   {
@@ -14,5 +14,9 @@
     "name": "task4",
     "creatorId": 2,
     "statusId": 2
+  },
+  {
+    "name": "task7",
+    "creatorId": 1
   }
 ]

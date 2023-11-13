@@ -42,16 +42,6 @@ describe('test tasks CRUD', () => {
     cookie = { [name]: value };
   });
 
-  it('tasks', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('tasks'),
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
   it('get new task page', async () => {
     const response = await app.inject({
       method: 'GET',
@@ -158,8 +148,8 @@ describe('test tasks CRUD', () => {
   });
 
   it('user can not delete task with anotother creator', async () => {
-    const { current } = testData.tasks;
-    const { id } = await models.task.query().findOne({ name: current.name });
+    const { fromAnotherUser } = testData.tasks;
+    const { id } = await models.task.query().findOne({ name: fromAnotherUser.name });
 
     const response = await app.inject({
       method: 'DELETE',

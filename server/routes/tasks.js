@@ -1,5 +1,4 @@
 import i18next from 'i18next';
-import _ from 'lodash';
 
 export default (app) => {
   app
@@ -52,16 +51,22 @@ export default (app) => {
       return reply;
     })
     .get('/tasks/:id/edit', { name: 'editTask', preValidation: app.authenticate }, async (req, reply) => {
+      const { id } = req.params;
+      const taskToEdit = await app.objection.models.task.query().findById(id).withGraphJoined('[labels]');
+      if (!app.checkIfUserIsTaskCreator(req.user.id, taskToEdit)) {
+        req.flash('error', i18next.t('flash.tasks.update.error'));
+        reply.redirect(app.reverse('tasks'));
+        return reply;
+      }
       const users = await app.objection.models.user.query();
       const usersNormalized = users.map((user) => ({ ...user, name: user.firstName }));
       const statuses = await app.objection.models.status.query();
       const labels = await app.objection.models.label.query();
-      const { id } = req.params;
-      const taskToEdit = await app.objection.models.task.query().findById(id).withGraphJoined('[labels]');
-      await console.log(taskToEdit, 'TASK_TO_EDIT');
+
       reply.render('tasks/edit', {
         usersNormalized, statuses, labels, taskToEdit,
       });
+
       return reply;
     })
     .get('/tasks/:id', { name: 'showTask', preValidation: app.authenticate }, async (req, reply) => {
@@ -75,7 +80,6 @@ export default (app) => {
     })
     .post('/tasks', { name: 'createTask', preValidation: app.authenticate }, async (req, reply) => {
       const { statusId, labels, executorId } = req.body.data;
-      await console.log(req.body.data, 'CREATE TASK DATA');
 
       const normalizeLabels = (l) => {
         if (!l) {
@@ -157,22 +161,23 @@ export default (app) => {
         return reply;
       } catch (err) {
         await console.log(err);
+        throw (err);
       }
     })
     .delete('/tasks/:id', { name: 'deleteTask', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
-        const { creatorId } = await app.objection.models.task.query().findById(id);
-        if (req.user.id !== creatorId) {
+        const task = await app.objection.models.task.query().findById(id);
+        await console.log(task, 'TASK TO DElETE - LOG');
+        if (!app.checkIfUserIsTaskCreator(req.user.id, task)) {
           req.flash('error', i18next.t('flash.tasks.delete.authError'));
-          reply.redirect('/tasks');
         } else {
           const taskToDelete = await app.objection.models.task.query().findById(id);
           await taskToDelete.$query().delete();
           req.flash('info', i18next.t('flash.tasks.delete.success'));
-          reply.redirect(app.reverse('tasks'));
-          return reply;
         }
+        reply.redirect(app.reverse('tasks'));
+        return reply;
       } catch (err) {
         await console.log(err);
         throw (err);

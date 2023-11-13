@@ -48,8 +48,12 @@ export default (app) => {
       try {
         const { id } = req.params;
         const statusToDelete = await app.objection.models.status.query().findById(id);
-        await statusToDelete.$query().delete();
-        req.flash('success', i18next.t('flash.statuses.delete.success'));
+        if (await app.checkIfEntityConnectedWithTask(statusToDelete)) {
+          req.flash('error', i18next.t('flash.statuses.delete.error'));
+        } else {
+          await statusToDelete.$query().delete();
+          req.flash('success', i18next.t('flash.statuses.delete.success'));
+        }
         reply.redirect(app.reverse('statuses'));
         return reply;
       } catch (err) {

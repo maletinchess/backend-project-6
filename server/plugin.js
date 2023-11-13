@@ -133,13 +133,12 @@ const registerPlugins = async (app) => {
     }
   });
 
-  app.decorate('checkIfUserCreatedTask', async (req, reply) => {
-    const { creatorId } = await app.objection.models.task.query().findById(req.params.id);
-    if (req.user.id !== creatorId) {
-      req.flash('error', i18next.t('flash.tasks.authError'));
-      reply.redirect('/tasks');
-    }
+  app.decorate('checkIfEntityConnectedWithTask', async (entity) => {
+    const connectedTasks = await entity.$relatedQuery('tasks');
+    return connectedTasks.length > 0;
   });
+
+  app.decorate('checkIfUserIsTaskCreator', (userId, task) => userId === task.creatorId);
 
   await app.register(fastifyMethodOverride);
   await app.register(fastifyObjectionjs, {
@@ -170,7 +169,6 @@ export default async (app, _options) => {
   addRoutes(app);
   addHooks(app);
   addErrorHandler(app);
-  rollbar.log('Hello world!');
 
   return app;
 };

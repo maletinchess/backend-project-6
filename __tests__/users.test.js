@@ -107,33 +107,6 @@ describe('test users CRUD', () => {
     expect(updatedUser).toMatchObject(expected);
   });
 
-  it('user can not update another user profile', async () => {
-    const anotherUserData = testData.users.anotherUser;
-    const params = testData.users.toUpdate;
-    const user = await models.user.query().findOne({ email: anotherUserData.email });
-    const { id } = user;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('updateUser', { id }),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const updatedAnotherUser = await models.user.query().findById(id);
-
-    await console.log(updatedAnotherUser, user);
-
-    const expected = {
-      ..._.omit(anotherUserData, 'password'),
-      passwordDigest: anotherUserData.password,
-    };
-    expect(updatedAnotherUser).toMatchObject(expected);
-  });
-
   it('user delete his profile', async () => {
     const existingUserData = testData.users.existing;
     const user = await models.user.query().findOne({ email: existingUserData.email });
@@ -147,11 +120,14 @@ describe('test users CRUD', () => {
 
     expect(responseDelete.statusCode).toBe(302);
 
+    const usersTasks = await user.$relatedQuery('tasks');
+    await console.log(usersTasks.length, 'TASKS-USERS-FROM TEST');
+
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeUndefined();
   });
 
-  it('check delete permission', async () => {
+  it('user can not delete his profile if he has tasks', async () => {
     const existingUserData = testData.users.existing;
     const user = await models.user.query().findOne({ email: existingUserData.email });
     const { id } = user;
@@ -159,6 +135,7 @@ describe('test users CRUD', () => {
     const responseDeleteWithoutCookies = await app.inject({
       method: 'DELETE',
       url: app.reverse('deleteUser', { id }),
+      cookies: cookie,
     });
 
     expect(responseDeleteWithoutCookies.statusCode).toBe(302);

@@ -13,7 +13,7 @@ mixin input(entity, propertyName, errors = {})
     input(
       id= inputId
       name=getInputName(propertyName)
-      placeholder= propertyName
+      placeholder= t(`views.labels.${propertyName}`)
       class=classLine
       value=_.get(entity, propertyName, '')
     )&attributes(attributes)
@@ -27,9 +27,6 @@ mixin buttonTo(action, method)
   form(action=action, method="post")
     input(name="_method" type="hidden" value=method)
     input(type='submit')&attributes(attributes)
-
-mixin textarea(entity, propertyName, errors = {})
-  .form-group(class=(errors[propertyName] && 'has-danger'))
 
 mixin select(entity, propertyName, errors = {}, items, multiple = false)
   - propertyErrors = _.get(errors, propertyName)

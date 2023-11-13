@@ -15,6 +15,14 @@
     "anotherUser": {
       "email": "abcdefgh.kulas87@outlook.com",
       "password": "567uyicsszrre"
+    },
+    "authorizedUserWithoutTasks": {
+      "email": "authorizedWithoutTasks@list.com",
+      "password": "iwubvpwunvpw2bvpiwbpbc"
+    },
+    "anotherUserWithoutTasks": {
+      "email": "anotherUserdWithoutTasks@list.com",
+      "password": "ppebvgpenpiugvpncw"
     }
   },
   "statuses": {
@@ -35,6 +43,9 @@
     },
     "current": {
       "name": "task2"
+    },
+    "fromAnotherUser": {
+      "name": "task7"
     },
     "taskToDelete": {
       "name": "task4"
