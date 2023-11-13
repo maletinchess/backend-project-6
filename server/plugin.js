@@ -20,8 +20,8 @@ import fastifyObjectionjs from 'fastify-objectionjs';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
-
 import Rollbar from 'rollbar';
+import encrypt from './lib/secure.cjs';
 
 import ru from './locales/ru.js';
 import en from './locales/en.js';
@@ -101,7 +101,7 @@ const registerPlugins = async (app) => {
   await app.register(fastifyReverseRoutes);
   await app.register(fastifyFormbody, { parser: qs.parse });
   await app.register(fastifySecureSession, {
-    secret: `${process.env.SESSION_KEY}`,
+    secret: encrypt(`${process.env.SESSION_KEY}`),
     cookie: {
       path: '/',
     },
