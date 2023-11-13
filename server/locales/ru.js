@@ -180,6 +180,8 @@ export default {
           edit: 'Изменить',
           delete: 'Удалить',
         },
+        email: 'Email',
+        password: 'Пароль',
       },
     },
   },
