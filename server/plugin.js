@@ -1,5 +1,6 @@
 // @ts-check
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as dotenv from 'dotenv';
 
 import { fileURLToPath } from 'url';
@@ -151,6 +152,8 @@ const addErrorHandler = (app) => {
   app.setErrorHandler((error, req, reply) => {
     if (isProduction) {
       rollbar.log(error);
+      req.flash('error', error.message);
+      reply.redirect('/');
     }
   });
 };

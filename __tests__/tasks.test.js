@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import fastify from 'fastify';
 
 import init from '../server/plugin.js';
