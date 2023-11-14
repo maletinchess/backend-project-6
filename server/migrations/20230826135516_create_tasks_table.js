@@ -1,5 +1,5 @@
-export const up = (knex) => (
-    knex.schema.createTable('tasks', (table) => {
+export const up = async (knex) => (
+    await knex.schema.createTable('tasks', (table) => {
       table.increments('id').primary();
       table.string('name').notNullable();
       table.string('description');
