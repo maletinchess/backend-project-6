@@ -9,7 +9,7 @@ mixin input(entity, propertyName, errors = {})
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (_.isEmpty(propertyErrors) ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
-  .mb-3(class=(errors[propertyName] && 'has-danger'))
+  .mb-3.form-floating(class=(errors[propertyName] && 'has-danger'))
     input(
       id= inputId
       name=getInputName(propertyName)
@@ -17,6 +17,7 @@ mixin input(entity, propertyName, errors = {})
       class=classLine
       value=_.get(entity, propertyName, '')
     )&attributes(attributes)
+    label(for=inputId)= t(`views.labels.${propertyName}`)
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
