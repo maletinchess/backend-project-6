@@ -1,6 +1,6 @@
 // @ts-check
-export const up = (knex) => (
-  knex.schema.createTable('users', (table) => {
+export const up =  async (knex) => (
+  await knex.schema.createTable('users', (table) => {
     table.increments('id').primary();
     table.string('email');
     table.string('password_digest');
