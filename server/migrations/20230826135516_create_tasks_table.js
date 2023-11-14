@@ -11,4 +11,4 @@ export const up = (knex) => (
     })
   );
   
-export const down = (knex) => knex.schema.dropTable('users');
+export const down = (knex) => knex.schema.dropTable('tasks');
