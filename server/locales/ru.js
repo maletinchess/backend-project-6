@@ -182,6 +182,8 @@ export default {
         },
         email: 'Email',
         password: 'Пароль',
+        firstName: 'Имя',
+        lastName: 'Фамилия',
       },
     },
   },
