@@ -11,4 +11,4 @@ export const up = async (knex) => (
     })
   );
   
-export const down = (knex) => knex.schema.dropTable('tasks');
+export const down = async (knex) =>  await knex.schema.dropTable('tasks');

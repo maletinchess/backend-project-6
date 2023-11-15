@@ -5,4 +5,4 @@ export const up = async (knex) => {
     });
   };
   
-  export const down = (knex) => knex.schema.dropTable('labels_tasks');
+  export const down = async (knex) => await knex.schema.dropTable('labels_tasks');
