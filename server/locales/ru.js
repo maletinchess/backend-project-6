@@ -100,7 +100,8 @@ export default {
           edit: 'Изменить',
         },
         edit: {
-          submit: 'Сохранить',
+          header: 'Изменение пользователя',
+          submit: 'Изменить',
         },
       },
       welcome: {
