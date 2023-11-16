@@ -10,5 +10,5 @@ block content
     +select(taskToEdit, 'statusId', errors, statuses)
     +select(taskToEdit, 'executorId', errors, usersNormalized)
     +select(taskToEdit, 'labels', errors, labels, true)
-    +input(name="_method" type="hidden" value="patch")
+    input(name="_method" type="hidden" value="patch")
     +submit(taskToEdit)(value=t('views.tasks.editTask.submit'))
