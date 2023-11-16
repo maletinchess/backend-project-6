@@ -57,8 +57,8 @@ export default (app) => {
         const { id } = req.params;
         const user = await app.objection.models.user.query().findById(id);
         const usersTasks = await user.$relatedQuery('tasks');
-        await console.log(req.user.id, usersTasks, 'TASKS-USERS');
-        if (app.checkIfEntityConnectedWithTask(user)) {
+        await console.log(req.user.id, usersTasks, 'server/plugin.js: LOG-TASKS-USERS');
+        if (usersTasks.length > 0) {
           req.flash('error', i18next.t('flash.users.delete.error'));
         } else {
           await user.$query().delete();

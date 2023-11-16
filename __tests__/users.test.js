@@ -120,9 +120,6 @@ describe('test users CRUD', () => {
 
     expect(responseDelete.statusCode).toBe(302);
 
-    const usersTasks = await user.$relatedQuery('tasks');
-    await console.log(usersTasks.length, 'TASKS-USERS-FROM TEST');
-
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeUndefined();
   });
@@ -137,6 +134,9 @@ describe('test users CRUD', () => {
       url: app.reverse('deleteUser', { id }),
       cookies: cookie,
     });
+
+    const usersTasks = await user.$relatedQuery('tasks');
+    await console.log(usersTasks.length, 'TASKS-USERS-FROM TEST');
 
     expect(responseDeleteWithoutCookies.statusCode).toBe(302);
 
