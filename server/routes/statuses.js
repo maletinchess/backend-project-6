@@ -28,8 +28,11 @@ export default (app) => {
         req.flash('info', i18next.t('flash.statuses.create.success'));
         reply.redirect(app.reverse('statuses'));
       } catch (err) {
-        await console.log(err, err.data.name[0]);
+        const { data } = err;
+        req.flash('error', i18next.t('flash.statuses.create.error'));
+        reply.render(app.reverse('getNewStatusPage'), { status, errors: data });
       }
+      return reply;
     })
     .post('/statuses/:id', { name: 'updateStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
@@ -38,11 +41,11 @@ export default (app) => {
         await statusToEdit.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.statuses.update.success'));
         reply.redirect(app.reverse('statuses'));
-        return reply;
       } catch (err) {
         console.log(err);
         throw (err);
       }
+      return reply;
     })
     .delete('/statuses/:id', { name: 'deleteStatus', preValidation: app.authenticate }, async (req, reply) => {
       try {
