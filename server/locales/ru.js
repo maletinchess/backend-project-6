@@ -155,7 +155,7 @@ export default {
         labels: 'Метки',
         executorId: 'Исполнитель',
         statusId: 'Статус',
-        description: 'описание задачи',
+        description: 'Описание',
         filter: {
           status: 'Статус',
           executor: 'Исполнитель',
