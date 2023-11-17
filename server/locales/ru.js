@@ -120,7 +120,7 @@ export default {
           header: 'Создание статуса',
         },
         editStatus: {
-          submit: 'Изменить статус',
+          submit: 'Изменить',
           header: 'Изменение статуса',
         },
         createNewStatusSubmitButton: 'Создать статус',
