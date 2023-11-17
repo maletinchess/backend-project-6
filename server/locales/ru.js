@@ -57,6 +57,7 @@ export default {
       labels: {
         create: {
           success: 'Метка успешно создана',
+          error: 'Не удалось создать метку',
         },
         update: {
           success: 'Метка успешно изменена',

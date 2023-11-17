@@ -23,15 +23,15 @@ export default (app) => {
       label.$set(req.body.data);
       try {
         const validLabel = await app.objection.models.label.fromJson(req.body.data);
-        await console.log(validLabel);
         await app.objection.models.label.query().insert(validLabel);
         req.flash('info', i18next.t('flash.labels.create.success'));
         reply.redirect(app.reverse('labels'));
-        return reply;
       } catch (err) {
-        await console.log(err, 'CREATE LABEL ERROR');
-        throw (err);
+        const { data } = err;
+        req.flash('error', i18next.t('flash.labels.create.error'));
+        reply.render(app.reverse('newLabel'), { label, errors: data });
       }
+      return reply;
     })
     .post('/labels/:id', { name: 'updateLabel', preValidation: app.authenticate }, async (req, reply) => {
       try {
