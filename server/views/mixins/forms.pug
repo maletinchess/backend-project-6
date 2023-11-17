@@ -35,7 +35,7 @@ mixin select(entity, propertyName, errors = {}, items, multiple = false)
   - inputId = getInputId(propertyName)
   - name = getInputName(propertyName)
   - selectedOptions = entity[propertyName] ? [entity[propertyName]].flat().map((item) => item.id ? Number(item.id) : Number(item)) : []
-  .form-group
+  .mb-3
     label(for=inputId)= t(`views.tasks.${propertyName}`)
     select.form-control(
         id= inputId,
@@ -56,7 +56,7 @@ mixin textarea(entity, propertyName, errors = {})
   - inputId = getInputId(propertyName)
   - name = getInputName(propertyName)
   - value=_.get(entity, propertyName, '')
-  .form-group(class=(errors[propertyName] && 'has-danger'))
+  .mb-3(class=(errors[propertyName] && 'has-danger'))
     label(
       for= inputId
     )= t(`views.tasks.${propertyName}`)
