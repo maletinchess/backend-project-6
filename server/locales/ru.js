@@ -165,7 +165,7 @@ export default {
 
       },
       labels: {
-        createNewLabelButton: 'Создать Метки',
+        createNewLabelButton: 'Создать метку',
         id: 'ID',
         name: 'Наименование',
         createdAt: 'Дата создания',
