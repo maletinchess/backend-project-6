@@ -31,7 +31,7 @@ export default (app) => {
 
       const task = await new app.objection.models.task();
 
-      const usersNormalized = users.map((user) => ({ ...user, name: user.firstName }));
+      const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
 
       reply.render('tasks/index', {
         tasks, usersNormalized, statuses, labels, task, query,
@@ -41,7 +41,8 @@ export default (app) => {
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
       const users = await app.objection.models.user.query();
-      const usersNormalized = users.map((user) => ({ ...user, name: user.firstName }));
+      const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
+      await console.log(usersNormalized);
       const statuses = await app.objection.models.status.query();
       const task = new app.objection.models.task();
       const labels = await app.objection.models.label.query();
@@ -59,7 +60,8 @@ export default (app) => {
         return reply;
       }
       const users = await app.objection.models.user.query();
-      const usersNormalized = users.map((user) => ({ ...user, name: user.firstName }));
+      const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
+
       const statuses = await app.objection.models.status.query();
       const labels = await app.objection.models.label.query();
 
