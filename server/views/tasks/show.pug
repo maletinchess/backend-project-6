@@ -10,11 +10,11 @@ block content
     .container
       .row.p-1
         .col= t('views.tasks.creator')
-        .col= `${task.creator.firstName}`
+        .col= `${task.creator.firstName} ${task.creator.lastName}`
       .row.p-1
         .col= t('views.tasks.executorId')
         if task.executor
-          .col= `${task.executor.firstName}`
+          .col= `${task.executor.firstName} ${task.executor.lastName}`
         else
           .col
       .row.p-1
