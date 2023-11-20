@@ -83,4 +83,4 @@ mixin checkbox(entityName, propertyName)
   - name = getInputName(propertyName)
   .form-group.form-check
     input.form-check-input(id=inputId type='checkbox', name=propertyName, checked=(!!query[propertyName]))
-    label.form-check-label(for-=inputId)= t(`views.${entityName}s.filter.checkbox`)
+    label.form-check-label(for=inputId)= t(`views.${entityName}s.filter.checkbox`)
