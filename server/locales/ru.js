@@ -44,6 +44,7 @@ export default {
       tasks: {
         create: {
           success: 'Задача успешно создана',
+          error: 'Не удалось создать задачу',
         },
         update: {
           success: 'Задача успешно изменена',

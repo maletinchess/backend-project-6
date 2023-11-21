@@ -1,54 +1,72 @@
 import i18next from 'i18next';
 
+const getDataForRender = async (app) => {
+  const users = await app.objection.models.user.query();
+  const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
+  await console.log(usersNormalized);
+  const statuses = await app.objection.models.status.query();
+  const task = new app.objection.models.task();
+  const labels = await app.objection.models.label.query();
+
+  return {
+    usersNormalized, statuses, labels, task,
+  };
+};
+
+const makeTaskQuery = (app, req) => {
+  const { query, user: { id } } = req;
+  const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
+
+  if (query.executor) {
+    tasksQuery.modify('filterExecutor', query.executor);
+  }
+
+  if (query.status) {
+    tasksQuery.modify('filterStatus', query.status);
+  }
+
+  if (query.label) {
+    tasksQuery.modify('filterLabel', query.label);
+  }
+
+  if (query.isCreatorUser) {
+    tasksQuery.modify('filterCreator', id);
+  }
+
+  return tasksQuery;
+};
+
+const getDataForRenderTasks = async (app, req) => {
+  const task = await new app.objection.models.task();
+  const { query } = req;
+  const tasksQuery = makeTaskQuery(app, req);
+
+  const [tasks, users, statuses, labels] = await Promise.all([
+    tasksQuery,
+    app.objection.models.user.query(),
+    app.objection.models.status.query(),
+    app.objection.models.label.query(),
+  ]);
+
+  const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
+
+  const data = {
+    task, tasks, usersNormalized, statuses, labels, query,
+  };
+
+  return data;
+};
+
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks' }, async (req, reply) => {
-      const { query, user: { id } } = req;
-      const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
-
-      if (query.executor) {
-        tasksQuery.modify('filterExecutor', query.executor);
-      }
-
-      if (query.status) {
-        tasksQuery.modify('filterStatus', query.status);
-      }
-
-      if (query.label) {
-        tasksQuery.modify('filterLabel', query.label);
-      }
-
-      if (query.isCreatorUser) {
-        tasksQuery.modify('filterCreator', id);
-      }
-
-      const [tasks, users, statuses, labels] = await Promise.all([
-        tasksQuery,
-        app.objection.models.user.query(),
-        app.objection.models.status.query(),
-        app.objection.models.label.query(),
-      ]);
-
-      const task = await new app.objection.models.task();
-
-      const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
-
-      reply.render('tasks/index', {
-        tasks, usersNormalized, statuses, labels, task, query,
-      });
-
+      const data = await getDataForRenderTasks(app, req);
+      reply.render('tasks/index', data);
       return reply;
     })
     .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
-      const users = await app.objection.models.user.query();
-      const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
-      await console.log(usersNormalized);
-      const statuses = await app.objection.models.status.query();
-      const task = new app.objection.models.task();
-      const labels = await app.objection.models.label.query();
-      reply.render('tasks/new', {
-        task, usersNormalized, statuses, labels,
-      });
+      const data = await getDataForRender(app);
+      reply.render('tasks/new', data);
       return reply;
     })
     .get('/tasks/:id/edit', { name: 'editTask', preValidation: app.authenticate }, async (req, reply) => {
@@ -98,10 +116,12 @@ export default (app) => {
 
       const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : 0;
 
+      const statusIdNormalized = statusId && statusId !== '' ? parseInt(statusId, 10) : 0;
+
       const graph = {
         ...req.body.data,
         creatorId: parseInt(req.user.id, 10),
-        statusId: parseInt(statusId, 10),
+        statusId: statusIdNormalized,
         executorId: executorIdNormalized,
       };
 
@@ -116,9 +136,13 @@ export default (app) => {
         });
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
-      } catch (e) {
-        await console.log(e, 'ERROR');
+      } catch (err) {
+        const { data } = err;
+        const dataForRender = await getDataForRender(app);
+        req.flash('error', i18next.t('flash.tasks.create.error'));
+        reply.render(app.reverse('newTask'), { ...dataForRender, errors: data });
       }
+      return reply;
     })
     .patch('/tasks/:id', { name: 'updateTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
