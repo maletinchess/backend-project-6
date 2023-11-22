@@ -139,7 +139,7 @@ export default (app) => {
       } catch (err) {
         const { data } = err;
         await console.log(data);
-        const dataForRender = await getDataForRender(app);
+        const dataForRender = await getDataForRender(app, req);
         req.flash('error', i18next.t('flash.tasks.create.error'));
         reply.render(app.reverse('newTask'), { ...dataForRender, errors: data });
       }
