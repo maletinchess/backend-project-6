@@ -114,7 +114,8 @@ export default (app) => {
 
       const labelsNormalized = normalizeLabels(labels);
 
-      const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : 0;
+      const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : null;
+      await console.log(executorId, Number.isInteger(executorIdNormalized), 'executorID LOG');
 
       const statusIdNormalized = statusId && statusId !== '' ? parseInt(statusId, 10) : 0;
 

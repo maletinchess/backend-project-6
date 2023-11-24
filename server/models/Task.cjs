@@ -20,7 +20,7 @@ module.exports = class Task extends unique(BaseModel) {
         description: { type: 'string' },
         creatorId: { type: 'integer' },
         statusId: { type: 'integer', minimum: 1 },
-        executorId: { type: 'integer' },
+        executorId: { type: ['integer', 'null'] },
       },
     };
   }
