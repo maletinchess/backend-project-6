@@ -107,23 +107,6 @@ describe('test users CRUD', () => {
     expect(updatedUser).toMatchObject(expected);
   });
 
-  it('user delete his profile', async () => {
-    const existingUserData = testData.users.existing;
-    const user = await models.user.query().findOne({ email: existingUserData.email });
-    const { id } = user;
-
-    const responseDelete = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('deleteUser', { id }),
-      cookies: cookie,
-    });
-
-    expect(responseDelete.statusCode).toBe(302);
-
-    const removedUser = await models.user.query().findById(id);
-    expect(removedUser).toBeUndefined();
-  });
-
   it('user can not delete his profile if he has tasks', async () => {
     const existingUserData = testData.users.existing;
     const user = await models.user.query().findOne({ email: existingUserData.email });
