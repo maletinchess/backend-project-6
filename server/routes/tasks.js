@@ -3,7 +3,6 @@ import i18next from 'i18next';
 const getDataForRender = async (app) => {
   const users = await app.objection.models.user.query();
   const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
-  await console.log(usersNormalized);
   const statuses = await app.objection.models.status.query();
   const task = new app.objection.models.task();
   const labels = await app.objection.models.label.query();
@@ -139,7 +138,6 @@ export default (app) => {
         reply.redirect(app.reverse('tasks'));
       } catch (err) {
         const { data } = err;
-        await console.log(err);
         const dataForRender = await getDataForRender(app, req);
         req.flash('error', i18next.t('flash.tasks.create.error'));
         reply.render(app.reverse('newTask'), { ...dataForRender, errors: data });
@@ -164,7 +162,7 @@ export default (app) => {
 
       const labelsNormalized = normalizeLabels(labels);
 
-      const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : 0;
+      const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : null;
 
       const graph = {
         ...req.body.data,
