@@ -1,12 +1,11 @@
 // @ts-check
 
-import _ from 'lodash';
 import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import { getTestData, prepareData, getCookies } from './helpers/index.js';
 
-describe('test users CRUD', () => {
+describe('delete user - corner cases', () => {
   let app;
   let knex;
   let models;
@@ -39,13 +38,29 @@ describe('test users CRUD', () => {
     const user = await models.user.query().findOne({ email: userWithoutTasks.email });
     const { id } = user;
 
-    const responseDeleteWithoutCookies = await app.inject({
+    const responseDelete = await app.inject({
       method: 'DELETE',
       url: app.reverse('deleteUser', { id }),
       cookies: cookie,
     });
 
-    expect(responseDeleteWithoutCookies.statusCode).toBe(302);
+    expect(responseDelete.statusCode).toBe(302);
+
+    const removedUser = await models.user.query().findById(id);
+    expect(removedUser).toBeDefined();
+  });
+
+  it('user CAN NOT delete ANOTHER USER', async () => {
+    const existingUserData = testData.users.existing;
+    const { id } = await models.user.query().findOne({ email: existingUserData.email });
+
+    const responseDelete = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteUser', { id }),
+      cookies: cookie,
+    });
+
+    expect(responseDelete.statusCode).toBe(302);
 
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeDefined();
