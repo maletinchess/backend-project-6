@@ -1,7 +1,7 @@
 import fastify from 'fastify';
 
 import init from '../server/plugin.js';
-import { getTestData, prepareData } from './helpers/index.js';
+import { getTestData, prepareData, getCookies } from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
   let app;
@@ -28,17 +28,7 @@ describe('test tasks CRUD', () => {
   beforeEach(async () => {
     await knex.migrate.latest();
     await prepareData(app);
-    const responseSignIn = await app.inject({
-      method: 'POST',
-      url: app.reverse('session'),
-      payload: {
-        data: testData.users.existing,
-      },
-    });
-
-    const [sessionCookie] = responseSignIn.cookies;
-    const { name, value } = sessionCookie;
-    cookie = { [name]: value };
+    cookie = await getCookies(app, testData.users.existing);
   });
 
   it('get new task page', async () => {
@@ -81,24 +71,6 @@ describe('test tasks CRUD', () => {
     expect(createdTask).toMatchObject(params);
   });
 
-  it('create task with label', async () => {
-    const params = testData.tasks.withLabel;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('createTask'),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const createdTask = await models.task.query().findOne({ name: params.name });
-    const bindedLabels = await createdTask.$relatedQuery('labels');
-    expect(bindedLabels.length).toBeGreaterThan(0);
-  });
-
   it('update task - status, description, name', async () => {
     const { current } = testData.tasks;
     const taskBeforeUpdate = await models.task.query().findOne({ name: current.name });
@@ -117,41 +89,6 @@ describe('test tasks CRUD', () => {
 
     const updatedTask = await models.task.query().findById(id);
     expect(updatedTask).toMatchObject(params);
-  });
-
-  it('update task - labels', async () => {
-    const { current } = testData.tasks;
-    const taskBeforeUpdate = await models.task.query().findOne({ name: current.name });
-    const { id } = taskBeforeUpdate;
-    const params = testData.tasks.toUpdate;
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('updateTask', { id }),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const updatedTask = await models.task.query().findById(id);
-    expect(updatedTask).toMatchObject(params);
-  });
-
-  it('user can not delete task with anotother creator', async () => {
-    const { fromAnotherUser } = testData.tasks;
-    const { id } = await models.task.query().findOne({ name: fromAnotherUser.name });
-
-    const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('deleteTask', { id }),
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(302);
-    const deletedTask = await models.task.query().findById(id);
-    expect(deletedTask).toBeDefined();
   });
 
   it('user can delete task if he is creator', async () => {

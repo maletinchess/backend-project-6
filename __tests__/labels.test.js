@@ -1,7 +1,7 @@
 import fastify from 'fastify';
 
 import init from '../server/plugin.js';
-import { getTestData, prepareData } from './helpers/index.js';
+import { getTestData, prepareData, getCookies } from './helpers/index.js';
 
 describe('test labels CRUD', () => {
   let app;
@@ -24,17 +24,7 @@ describe('test labels CRUD', () => {
     await knex.migrate.latest();
     await prepareData(app);
 
-    const responseSignIn = await app.inject({
-      method: 'POST',
-      url: app.reverse('session'),
-      payload: {
-        data: testData.users.existing,
-      },
-    });
-
-    const [sessionCookie] = responseSignIn.cookies;
-    const { name, value } = sessionCookie;
-    cookie = { [name]: value };
+    cookie = await getCookies(app, testData.users.existing);
   });
 
   it('labels get', async () => {

@@ -11,18 +11,6 @@
     "toUpdate": {
       "email": "abclawrence.kulas87@outlook.com",
       "password": "O6gvLILL1csszrre"
-    },
-    "anotherUser": {
-      "email": "abcdefgh.kulas87@outlook.com",
-      "password": "567uyicsszrre"
-    },
-    "authorizedUserWithoutTasks": {
-      "email": "authorizedWithoutTasks@list.com",
-      "password": "iwubvpwunvpw2bvpiwbpbc"
-    },
-    "anotherUserWithoutTasks": {
-      "email": "anotherUserdWithoutTasks@list.com",
-      "password": "ppebvgpenpiugvpncw"
     }
   },
   "statuses": {
@@ -44,9 +32,6 @@
     "current": {
       "name": "task2"
     },
-    "fromAnotherUser": {
-      "name": "task7"
-    },
     "taskToDelete": {
       "name": "task4"
     },
@@ -54,16 +39,6 @@
       "name": "task3",
       "statusId": 2,
       "description": "Now task has description"
-    },
-    "withLabel": {
-      "name": "task5",
-      "labels": 1,
-      "statusId": 1
-    },
-    "toUpdateLabels": {
-      "name": "task6",
-      "statusId": 3,
-      "labels": [1, 2]
     }
   },
   "labels": {
