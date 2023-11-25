@@ -13,9 +13,7 @@ export default (app) => {
     })
     .get('/statuses/:id/edit', { name: 'editStatus', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
-      await console.log(id);
       const statusToEdit = await app.objection.models.status.query().findById(id);
-      await console.log(statusToEdit, 'STATUS');
       reply.render('statuses/edit', { statusToEdit });
       return reply;
     })
@@ -42,7 +40,7 @@ export default (app) => {
         req.flash('success', i18next.t('flash.statuses.update.success'));
         reply.redirect(app.reverse('statuses'));
       } catch (err) {
-        console.log(err);
+        await console.log(err);
         throw (err);
       }
       return reply;

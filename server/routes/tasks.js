@@ -114,7 +114,6 @@ export default (app) => {
       const labelsNormalized = normalizeLabels(labels);
 
       const executorIdNormalized = executorId && executorId !== '' ? parseInt(executorId, 10) : null;
-      await console.log(executorId, Number.isInteger(executorIdNormalized), 'executorID LOG');
 
       const statusIdNormalized = statusId && statusId !== '' ? parseInt(statusId, 10) : 0;
 
@@ -147,7 +146,6 @@ export default (app) => {
     .patch('/tasks/:id', { name: 'updateTask', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const { statusId, executorId, labels } = req.body.data;
-      await console.log(req.body.data, 'REQ BODY DATA: UPDATE TASK');
 
       const normalizeLabels = (l) => {
         if (!l) {
@@ -194,7 +192,6 @@ export default (app) => {
       try {
         const { id } = req.params;
         const task = await app.objection.models.task.query().findById(id);
-        await console.log(task, 'TASK TO DElETE - LOG');
         if (!app.checkIfUserIsTaskCreator(req.user.id, task)) {
           req.flash('error', i18next.t('flash.tasks.delete.authError'));
         } else {

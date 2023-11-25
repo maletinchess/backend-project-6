@@ -118,9 +118,6 @@ describe('test users CRUD', () => {
       cookies: cookie,
     });
 
-    const usersTasks = await user.$relatedQuery('tasks');
-    await console.log(usersTasks.length, 'TASKS-USERS-FROM TEST');
-
     expect(responseDeleteWithoutCookies.statusCode).toBe(302);
 
     const removedUser = await models.user.query().findById(id);
