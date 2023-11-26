@@ -24,17 +24,21 @@ export const prepareData = async (app) => {
 };
 
 export const getCookies = async (app, userData) => {
-  const responseSignIn = await app.inject({
-    method: 'POST',
-    url: app.reverse('session'),
-    payload: {
-      data: userData,
-    },
-  });
+  try {
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: userData,
+      },
+    });
 
-  const [sessionCookie] = responseSignIn.cookies;
-  const { name, value } = sessionCookie;
-  const cookie = { [name]: value };
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    const cookie = { [name]: value };
 
-  return cookie;
+    return cookie;
+  } catch (err) {
+    await console.log(err);
+  }
 };

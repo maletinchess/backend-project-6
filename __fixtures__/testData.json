@@ -14,7 +14,7 @@
     },
     "userWithoutTasks": {
       "email": "elbert_abshire52@gmail.com",
-      "password": "vtvvtbnu"
+      "password": "vtvvtbpoambpwobmnbnu"
     }
   },
   "statuses": {
@@ -43,6 +43,12 @@
       "name": "task3",
       "statusId": 2,
       "description": "Now task has description"
+    },
+    "newTaskWithLabels": {
+      "name": "taskWithlabels",
+      "statusId": 1,
+      "executorId": 3,
+      "labels": ["1", "2", "3"]
     }
   },
   "labels": {

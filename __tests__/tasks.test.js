@@ -71,6 +71,41 @@ describe('test tasks CRUD', () => {
     expect(createdTask).toMatchObject(params);
   });
 
+  it('create task with labels', async () => {
+    const params = testData.tasks.newTaskWithLabels;
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('createTask'),
+      payload: {
+        data: params,
+      },
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const taskWithoutGraph = await models.task.query().findOne({ name: params.name });
+    await console.log(taskWithoutGraph);
+    const { id } = taskWithoutGraph;
+    const createdTaskWithGraph = await models.task.query().findById(id).withGraphJoined('[labels, creator, status]');
+    await console.log(createdTaskWithGraph);
+
+    const label = await models.label.query().findById(1);
+    const relatedTasks = await label.$relatedQuery('tasks');
+    await console.log(relatedTasks);
+    const expectedCreatorId = 2;
+    const expectedStatusId = 1;
+    const expectedLabelsLength = 3;
+    const actualCreatorId = createdTaskWithGraph.creator.id;
+    const actualStatusId = createdTaskWithGraph.status.id;
+    const actualLabelsLength = createdTaskWithGraph.labels.length;
+
+    expect(actualCreatorId).toEqual(expectedCreatorId);
+    expect(actualStatusId).toEqual(expectedStatusId);
+    expect(actualLabelsLength).toEqual(expectedLabelsLength);
+    expect(relatedTasks).toContainEqual(taskWithoutGraph);
+  });
+
   it('update task - status, description, name', async () => {
     const { current } = testData.tasks;
     const taskBeforeUpdate = await models.task.query().findOne({ name: current.name });
@@ -93,7 +128,8 @@ describe('test tasks CRUD', () => {
 
   it('user can delete task if he is creator', async () => {
     const { taskToDelete } = testData.tasks;
-    const { id } = await models.task.query().findOne({ name: taskToDelete.name });
+    const task = await models.task.query().findOne({ name: taskToDelete.name });
+    const { id } = task;
 
     const response = await app.inject({
       method: 'DELETE',

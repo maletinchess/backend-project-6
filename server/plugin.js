@@ -127,6 +127,7 @@ const registerPlugins = async (app) => {
   app.decorate('checkEditAndDeletePermission', async (req, reply) => {
     const { id: paramsId } = req.params;
     const normalizedParamsId = parseInt(paramsId, 10);
+    await console.log(req.user.id ?? 'NULL');
 
     if (req.user?.id !== normalizedParamsId) {
       req.flash('error', i18next.t('flash.users.authError'));

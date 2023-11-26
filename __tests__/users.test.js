@@ -114,6 +114,25 @@ describe('test users CRUD', () => {
     expect(removedUser).toBeDefined();
   });
 
+  it('user can delete his profile if he has not tasks', async () => {
+    const data = testData.users.userWithoutTasks;
+    const user = await models.user.query().findOne({ email: data.email });
+    const { id } = user;
+
+    const newCookie = await getCookies(app, data);
+
+    const responseDelete = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteUser', { id }),
+      cookies: newCookie,
+    });
+
+    expect(responseDelete.statusCode).toBe(302);
+
+    const removedUser = await models.user.query().findById(id);
+    expect(removedUser).toBeUndefined();
+  });
+
   afterEach(async () => {
     // Пока Segmentation fault: 11
     // после каждого теста откатываем миграции
