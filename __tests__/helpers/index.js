@@ -40,5 +40,6 @@ export const getCookies = async (app, userData) => {
     return cookie;
   } catch (err) {
     await console.log(err);
+    throw (err);
   }
 };

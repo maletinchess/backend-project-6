@@ -14,6 +14,7 @@ const getDataForRender = async (app) => {
 
 const makeTaskQuery = (app, req) => {
   const { query, user: { id } } = req;
+  console.log(query);
   const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
 
   if (query.executor) {
@@ -46,6 +47,8 @@ const getDataForRenderTasks = async (app, req) => {
     app.objection.models.status.query(),
     app.objection.models.label.query(),
   ]);
+
+  await console.log(tasks);
 
   const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
 
