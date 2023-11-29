@@ -133,6 +133,23 @@ describe('test users CRUD', () => {
     expect(removedUser).toBeUndefined();
   });
 
+  it('user can not delete another user profile', async () => {
+    const data = testData.users.userWithoutTasks;
+    const user = await models.user.query().findOne({ email: data.email });
+    const { id } = user;
+
+    const responseDelete = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('deleteUser', { id }),
+      cookies: cookie,
+    });
+
+    expect(responseDelete.statusCode).toBe(302);
+
+    const removedUser = await models.user.query().findById(id);
+    expect(removedUser).toBeDefined();
+  });
+
   afterEach(async () => {
     // Пока Segmentation fault: 11
     // после каждого теста откатываем миграции
