@@ -2,9 +2,9 @@ extends ../layouts/application.pug
 
 block content
   h1= t('layouts.application.tasks')
-  a.btn.btn-primary.mx-2(href=route('newTask'))= t('views.tasks.createNewTaskButton')
+  a.btn.btn-primary.mx-2(href=route('tasksNew'))= t('views.tasks.createNewTaskButton')
   .jumbotron.p-2
-    +formFor()(action=route('tasks') method='get' class="form-inline")
+    +formFor()(action=route('tasksIndex') method='get' class="form-inline")
       +filterSelect('task', 'status', statuses)
       +filterSelect('task', 'executor', usersNormalized)
       +filterSelect('task', 'label', labels)
@@ -25,7 +25,7 @@ block content
         tr
           td= task.id
           td
-            a(href=route('showTask', { id: task.id }))= task.name
+            a(href=route('tasksShow', { id: task.id }))= task.name
           td= task.status.name
           td= `${task.creator.firstName} ${task.creator.lastName}`
           if task.executor
@@ -36,6 +36,6 @@ block content
           td
             ul.nav
               li
-                a.btn.btn-primary.mx-2(href=route('editTask', { id: task.id }))= t('views.tasks.actions.edit')
+                a.btn.btn-primary.mx-2(href=route('tasksEdit', { id: task.id }))= t('views.tasks.actions.edit')
               li
-                +buttonTo(route('deleteTask', { id: task.id }), 'delete')(class="btn btn-danger" value=t('views.tasks.actions.delete'))
+                +buttonTo(route('tasksDelete', { id: task.id }), 'delete')(class="btn btn-danger" value=t('views.tasks.actions.delete'))

@@ -33,6 +33,6 @@ block content
         .col
           ul.nav
               li
-                a.btn.btn-primary.mx-2(href=route('editTask', { id: task.id }))= t('views.tasks.actions.edit')
+                a.btn.btn-primary.mx-2(href=route('tasksEdit', { id: task.id }))= t('views.tasks.actions.edit')
               li
-                +buttonTo(route('deleteTask', { id: task.id }), 'delete')(class="btn btn-danger" value=t('views.tasks.actions.delete'))
+                +buttonTo(route('tasksDelete', { id: task.id }), 'delete')(class="btn btn-danger" value=t('views.tasks.actions.delete'))

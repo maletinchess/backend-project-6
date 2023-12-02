@@ -5,7 +5,9 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
-import { getTestData, prepareData, getCookies } from './helpers/index.js';
+import {
+  getTestData, prepareData, getCookies, getUserIdByData,
+} from './helpers/index.js';
 
 describe('test users CRUD', () => {
   let app;
@@ -98,28 +100,24 @@ describe('test users CRUD', () => {
   });
 
   it('user can not delete his profile if he has tasks', async () => {
-    const existingUserData = testData.users.existing;
-    const user = await models.user.query().findOne({ email: existingUserData.email });
-    const { id } = user;
+    const id = await getUserIdByData(testData.users.existing, models.user);
 
-    const responseDeleteWithoutCookies = await app.inject({
+    const responseDelete = await app.inject({
       method: 'DELETE',
       url: app.reverse('deleteUser', { id }),
       cookies: cookie,
     });
 
-    expect(responseDeleteWithoutCookies.statusCode).toBe(302);
+    expect(responseDelete.statusCode).toBe(302);
 
     const removedUser = await models.user.query().findById(id);
     expect(removedUser).toBeDefined();
   });
 
   it('user can delete his profile if he has not tasks', async () => {
-    const data = testData.users.userWithoutTasks;
-    const user = await models.user.query().findOne({ email: data.email });
-    const { id } = user;
+    const id = await getUserIdByData(testData.users.userWithoutTasks, models.user);
 
-    const newCookie = await getCookies(app, data);
+    const newCookie = await getCookies(app, testData.users.userWithoutTasks);
 
     const responseDelete = await app.inject({
       method: 'DELETE',
@@ -134,9 +132,7 @@ describe('test users CRUD', () => {
   });
 
   it('user can not delete another user profile', async () => {
-    const data = testData.users.userWithoutTasks;
-    const user = await models.user.query().findOne({ email: data.email });
-    const { id } = user;
+    const id = await getUserIdByData(testData.users.userWithoutTasks, models.user);
 
     const responseDelete = await app.inject({
       method: 'DELETE',

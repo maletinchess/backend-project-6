@@ -1,7 +1,9 @@
 import fastify from 'fastify';
 
 import init from '../server/plugin.js';
-import { getTestData, prepareData, getCookies } from './helpers/index.js';
+import {
+  getTestData, prepareData, getCookies, getEntityIdByData,
+} from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
   let app;
@@ -34,7 +36,7 @@ describe('test tasks CRUD', () => {
   it('tasks', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('tasks'),
+      url: app.reverse('tasksIndex'),
       cookies: cookie,
       query: {
         label: '3',
@@ -47,7 +49,7 @@ describe('test tasks CRUD', () => {
   it('get new task page', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('newTask'),
+      url: app.reverse('tasksNew'),
       cookies: cookie,
     });
 
@@ -55,12 +57,11 @@ describe('test tasks CRUD', () => {
   });
 
   it('get edit-task page', async () => {
-    const { current } = testData.tasks;
-    const { id } = await models.task.query().findOne({ name: current.name });
+    const id = await getEntityIdByData(testData.tasks.current, models.task);
 
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('editTask', { id }),
+      url: app.reverse('tasksEdit', { id }),
       cookies: cookie,
     });
 
@@ -71,7 +72,7 @@ describe('test tasks CRUD', () => {
     const params = testData.tasks.new;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('createTask'),
+      url: app.reverse('tasksCreate'),
       payload: {
         data: params,
       },
@@ -88,7 +89,7 @@ describe('test tasks CRUD', () => {
     const params = testData.tasks.newTaskWithLabels;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('createTask'),
+      url: app.reverse('tasksCreate'),
       payload: {
         data: params,
       },
@@ -98,17 +99,15 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(302);
 
     const taskWithoutGraph = await models.task.query().findOne({ name: params.name });
-    await console.log(taskWithoutGraph);
     const { id } = taskWithoutGraph;
     const createdTaskWithGraph = await models.task.query().findById(id).withGraphJoined('[labels, creator, status]');
-    await console.log(createdTaskWithGraph);
 
-    const label = await models.label.query().findById(1);
+    const { idForCheck } = testData.labels.current;
+
+    const label = await models.label.query().findById(idForCheck);
     const relatedTasks = await label.$relatedQuery('tasks');
-    await console.log(relatedTasks);
-    const expectedCreatorId = 2;
-    const expectedStatusId = 1;
-    const expectedLabelsLength = 3;
+    const [expectedCreatorId, expectedStatusId, expectedLabelsLength] = [2, 1, 3];
+
     const actualCreatorId = createdTaskWithGraph.creator.id;
     const actualStatusId = createdTaskWithGraph.status.id;
     const actualLabelsLength = createdTaskWithGraph.labels.length;
@@ -120,13 +119,12 @@ describe('test tasks CRUD', () => {
   });
 
   it('update task - status, description, name', async () => {
-    const { current } = testData.tasks;
-    const taskBeforeUpdate = await models.task.query().findOne({ name: current.name });
-    const { id } = taskBeforeUpdate;
+    const id = await getEntityIdByData(testData.tasks.current, models.task);
+
     const params = testData.tasks.toUpdate;
     const response = await app.inject({
       method: 'PATCH',
-      url: app.reverse('updateTask', { id }),
+      url: app.reverse('tasksUpdate', { id }),
       payload: {
         data: params,
       },
@@ -140,13 +138,11 @@ describe('test tasks CRUD', () => {
   });
 
   it('user can delete task if he is creator', async () => {
-    const { taskToDelete } = testData.tasks;
-    const task = await models.task.query().findOne({ name: taskToDelete.name });
-    const { id } = task;
+    const id = await getEntityIdByData(testData.tasks.taskToDelete, models.task);
 
     const response = await app.inject({
       method: 'DELETE',
-      url: app.reverse('deleteTask', { id }),
+      url: app.reverse('tasksDelete', { id }),
       cookies: cookie,
     });
 

@@ -43,3 +43,13 @@ export const getCookies = async (app, userData) => {
     throw (err);
   }
 };
+
+export const getUserIdByData = async (data, user) => {
+  const { id } = await user.query().findOne({ email: data.email });
+  return id;
+};
+
+export const getEntityIdByData = async (data, entity) => {
+  const { id } = await entity.query().findOne({ name: data.name });
+  return id;
+};

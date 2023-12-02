@@ -14,7 +14,6 @@ const getDataForRender = async (app) => {
 
 const makeTaskQuery = (app, req) => {
   const { query, user: { id } } = req;
-  console.log(query);
   const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
 
   if (query.executor) {
@@ -48,8 +47,6 @@ const getDataForRenderTasks = async (app, req) => {
     app.objection.models.label.query(),
   ]);
 
-  await console.log(tasks);
-
   const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
 
   const data = {
@@ -61,22 +58,22 @@ const getDataForRenderTasks = async (app, req) => {
 
 export default (app) => {
   app
-    .get('/tasks', { name: 'tasks' }, async (req, reply) => {
+    .get('/tasks', { name: 'tasksIndex' }, async (req, reply) => {
       const data = await getDataForRenderTasks(app, req);
       reply.render('tasks/index', data);
       return reply;
     })
-    .get('/tasks/new', { name: 'newTask' }, async (req, reply) => {
+    .get('/tasks/new', { name: 'tasksNew' }, async (req, reply) => {
       const data = await getDataForRender(app);
       reply.render('tasks/new', data);
       return reply;
     })
-    .get('/tasks/:id/edit', { name: 'editTask', preValidation: app.authenticate }, async (req, reply) => {
+    .get('/tasks/:id/edit', { name: 'tasksEdit', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const taskToEdit = await app.objection.models.task.query().findById(id).withGraphJoined('[labels]');
       if (!app.checkIfUserIsTaskCreator(req.user.id, taskToEdit)) {
         req.flash('error', i18next.t('flash.tasks.update.error'));
-        reply.redirect(app.reverse('tasks'));
+        reply.redirect(app.reverse('tasksIndex'));
         return reply;
       }
       const users = await app.objection.models.user.query();
@@ -91,7 +88,7 @@ export default (app) => {
 
       return reply;
     })
-    .get('/tasks/:id', { name: 'showTask', preValidation: app.authenticate }, async (req, reply) => {
+    .get('/tasks/:id', { name: 'tasksShow', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const task = await app.objection.models.task
         .query()
@@ -100,7 +97,7 @@ export default (app) => {
       reply.render('tasks/show', { task });
       return reply;
     })
-    .post('/tasks', { name: 'createTask', preValidation: app.authenticate }, async (req, reply) => {
+    .post('/tasks', { name: 'tasksCreate', preValidation: app.authenticate }, async (req, reply) => {
       const { statusId, labels, executorId } = req.body.data;
 
       const normalizeLabels = (l) => {
@@ -137,16 +134,16 @@ export default (app) => {
             });
         });
         req.flash('info', i18next.t('flash.tasks.create.success'));
-        reply.redirect(app.reverse('tasks'));
+        reply.redirect(app.reverse('tasksIndex'));
       } catch (err) {
         const { data } = err;
         const dataForRender = await getDataForRender(app, req);
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        reply.render(app.reverse('newTask'), { ...dataForRender, errors: data });
+        reply.render(app.reverse('tasksNew'), { ...dataForRender, errors: data });
       }
       return reply;
     })
-    .patch('/tasks/:id', { name: 'updateTask', preValidation: app.authenticate }, async (req, reply) => {
+    .patch('/tasks/:id', { name: 'tasksUpdate', preValidation: app.authenticate }, async (req, reply) => {
       const { id } = req.params;
       const { statusId, executorId, labels } = req.body.data;
 
@@ -184,14 +181,14 @@ export default (app) => {
           );
         });
         req.flash('info', i18next.t('flash.tasks.update.success'));
-        reply.redirect(app.reverse('tasks'));
+        reply.redirect(app.reverse('tasksIndex'));
         return reply;
       } catch (err) {
         await console.log(err);
         throw (err);
       }
     })
-    .delete('/tasks/:id', { name: 'deleteTask', preValidation: app.authenticate }, async (req, reply) => {
+    .delete('/tasks/:id', { name: 'tasksDelete', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
         const task = await app.objection.models.task.query().findById(id);
@@ -202,7 +199,7 @@ export default (app) => {
           await taskToDelete.$query().delete();
           req.flash('info', i18next.t('flash.tasks.delete.success'));
         }
-        reply.redirect(app.reverse('tasks'));
+        reply.redirect(app.reverse('tasksIndex'));
         return reply;
       } catch (err) {
         await console.log(err);

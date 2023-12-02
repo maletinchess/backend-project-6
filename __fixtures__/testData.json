@@ -56,7 +56,8 @@
       "name": "label3"
     },
     "current": {
-      "name": "label1"
+      "name": "label1",
+      "idForCheck": 1
     },
     "toUpdate": {
       "name": "label2"
