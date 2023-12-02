@@ -1,14 +1,19 @@
 import i18next from 'i18next';
 
-const getDataForRender = async (app) => {
+const getCommonData = async (app) => {
   const users = await app.objection.models.user.query();
   const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
   const statuses = await app.objection.models.status.query();
-  const task = new app.objection.models.task();
   const labels = await app.objection.models.label.query();
+  const commonData = { usersNormalized, statuses, labels };
+  return commonData;
+};
 
+const getDataForRender = async (app) => {
+  const commonData = await getCommonData(app);
+  const task = new app.objection.models.task();
   return {
-    usersNormalized, statuses, labels, task,
+    ...commonData, task,
   };
 };
 
@@ -76,14 +81,11 @@ export default (app) => {
         reply.redirect(app.reverse('tasksIndex'));
         return reply;
       }
-      const users = await app.objection.models.user.query();
-      const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
 
-      const statuses = await app.objection.models.status.query();
-      const labels = await app.objection.models.label.query();
+      const commonData = await getCommonData(app);
 
       reply.render('tasks/edit', {
-        usersNormalized, statuses, labels, taskToEdit,
+        ...commonData, taskToEdit,
       });
 
       return reply;
