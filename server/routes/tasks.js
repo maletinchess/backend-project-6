@@ -35,8 +35,9 @@ const getDataForTasksRoute = async (app, req, routeName) => {
   const { id } = req.params;
 
   switch (routeName) {
-    case 'tasksIndex':
+    case 'tasksIndex': {
       return {};
+    }
     case 'tasksNew':
       return {
         task, usersNormalized, statuses, labels,
@@ -87,21 +88,27 @@ const getDataForTasksRoute = async (app, req, routeName) => {
   }
 };
 
-const getCommonData = async (app) => {
-  const users = await app.objection.models.user.query();
-  const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
-  const statuses = await app.objection.models.status.query();
-  const labels = await app.objection.models.label.query();
-  const commonData = { usersNormalized, statuses, labels };
-  return commonData;
+const createTaskTransaction = async (app, validData) => {
+  const { validTask, labels } = validData;
+  await app.objection.models.task.transaction(async (trx) => {
+    await app.objection.models.task
+      .query(trx)
+      .insertGraph([{ ...validTask, labels }], {
+        relate: ['labels'],
+      });
+  });
 };
 
-const getDataForRender = async (app) => {
-  const commonData = await getCommonData(app);
-  const task = new app.objection.models.task();
-  return {
-    ...commonData, task,
-  };
+const updateTaskTransaction = async (app, validData) => {
+  await app.objection.models.task.transaction(async (trx) => {
+    await app.objection.models.task.query(trx).upsertGraph(
+      { ...validData },
+      {
+        relate: true,
+        unrelate: true,
+      },
+    );
+  });
 };
 
 const makeTaskQuery = (app, req) => {
@@ -186,17 +193,12 @@ export default (app) => {
 
       try {
         const validTask = await app.objection.models.task.fromJson(graph);
-        await app.objection.models.task.transaction(async (trx) => {
-          await app.objection.models.task
-            .query(trx)
-            .insertGraph([{ ...validTask, labels }], {
-              relate: ['labels'],
-            });
-        });
+        const validData = { validTask, labels };
+        await createTaskTransaction(app, validData);
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasksIndex'));
       } catch (err) {
-        const dataForRender = await getDataForRender(app, req);
+        const dataForRender = await getDataForTasksRoute(app, req, 'tasksNew');
         req.flash('error', i18next.t('flash.tasks.create.error'));
         reply.render(app.reverse('tasksNew'), { ...dataForRender, errors: err.data });
       }
@@ -206,15 +208,7 @@ export default (app) => {
       const graph = await getDataForTasksRoute(app, req, 'tasksUpdate');
 
       try {
-        await app.objection.models.task.transaction(async (trx) => {
-          await app.objection.models.task.query(trx).upsertGraph(
-            { ...graph },
-            {
-              relate: true,
-              unrelate: true,
-            },
-          );
-        });
+        await updateTaskTransaction(app, graph);
         req.flash('info', i18next.t('flash.tasks.update.success'));
         reply.redirect(app.reverse('tasksIndex'));
         return reply;
