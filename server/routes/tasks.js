@@ -36,7 +36,32 @@ const getDataForTasksRoute = async (app, req, routeName) => {
 
   switch (routeName) {
     case 'tasksIndex': {
-      return {};
+      const { query } = req;
+      const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
+
+      if (query.executor) {
+        tasksQuery.modify('filterExecutor', query.executor);
+      }
+
+      if (query.status) {
+        tasksQuery.modify('filterStatus', query.status);
+      }
+
+      if (query.label) {
+        tasksQuery.modify('filterLabel', query.label);
+      }
+
+      if (query.isCreatorUser) {
+        tasksQuery.modify('filterCreator', req.user.id);
+      }
+
+      const [tasks] = await Promise.all([
+        tasksQuery,
+      ]);
+
+      return {
+        task, tasks, usersNormalized, labels, statuses, query,
+      };
     }
     case 'tasksNew':
       return {
@@ -111,54 +136,10 @@ const updateTaskTransaction = async (app, validData) => {
   });
 };
 
-const makeTaskQuery = (app, req) => {
-  const { query, user: { id } } = req;
-  const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
-
-  if (query.executor) {
-    tasksQuery.modify('filterExecutor', query.executor);
-  }
-
-  if (query.status) {
-    tasksQuery.modify('filterStatus', query.status);
-  }
-
-  if (query.label) {
-    tasksQuery.modify('filterLabel', query.label);
-  }
-
-  if (query.isCreatorUser) {
-    tasksQuery.modify('filterCreator', id);
-  }
-
-  return tasksQuery;
-};
-
-const getDataForRenderTasks = async (app, req) => {
-  const task = await new app.objection.models.task();
-  const { query } = req;
-  const tasksQuery = makeTaskQuery(app, req);
-
-  const [tasks, users, statuses, labels] = await Promise.all([
-    tasksQuery,
-    app.objection.models.user.query(),
-    app.objection.models.status.query(),
-    app.objection.models.label.query(),
-  ]);
-
-  const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
-
-  const data = {
-    task, tasks, usersNormalized, statuses, labels, query,
-  };
-
-  return data;
-};
-
 export default (app) => {
   app
     .get('/tasks', { name: 'tasksIndex' }, async (req, reply) => {
-      const data = await getDataForRenderTasks(app, req);
+      const data = await getDataForTasksRoute(app, req, 'tasksIndex');
       reply.render('tasks/index', data);
       return reply;
     })
