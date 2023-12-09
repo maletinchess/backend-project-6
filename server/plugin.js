@@ -136,7 +136,6 @@ const registerPlugins = async (app) => {
 
   app.decorate('checkIfEntityConnectedWithTask', async (entity) => {
     const connectedTasks = await entity.$relatedQuery('tasks');
-    await console.log(connectedTasks, connectedTasks.length, 'server/plugin.js: USERS LOG TASKS RELATEAD');
     return connectedTasks.length > 0;
   });
 

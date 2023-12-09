@@ -30,7 +30,7 @@ describe('test statuses CRUD', () => {
   it('statuses get', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('statuses'),
+      url: app.reverse('statusesIndex'),
       cookies: cookie,
     });
 
@@ -40,7 +40,7 @@ describe('test statuses CRUD', () => {
   it('statuses get new status page', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('getNewStatusPage'),
+      url: app.reverse('statusesNew'),
       cookies: cookie,
     });
 
@@ -51,7 +51,7 @@ describe('test statuses CRUD', () => {
     const params = testData.statuses.new;
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('createNewStatus'),
+      url: app.reverse('statusesCreate'),
       payload: {
         data: params,
       },
@@ -70,7 +70,7 @@ describe('test statuses CRUD', () => {
     const { id } = await models.status.query().findOne({ name: currentStatus.name });
     const response = await app.inject({
       method: 'POST',
-      url: app.reverse('updateStatus', { id }),
+      url: app.reverse('statusesUpdate', { id }),
       payload: {
         data: params,
       },
@@ -89,7 +89,7 @@ describe('test statuses CRUD', () => {
 
     const response = await app.inject({
       method: 'DELETE',
-      url: app.reverse('deleteStatus', { id }),
+      url: app.reverse('statusesDelete', { id }),
       cookies: cookie,
     });
 

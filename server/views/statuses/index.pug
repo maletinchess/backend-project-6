@@ -2,7 +2,7 @@ extends ../layouts/application.pug
 
 block content
   h1= t('layouts.application.statuses')
-  a.btn.btn-primary.mx-2(href=route('getNewStatusPage'))= t('views.statuses.createNewStatusSubmitButton')
+  a.btn.btn-primary.mx-2(href=route('statusesNew'))= t('views.statuses.createNewStatusSubmitButton')
   table.table.table-striped
     thead
       tr
@@ -18,7 +18,7 @@ block content
           td
             ul.nav
               li
-                a.btn.btn-primary.mx-2(href=route('editStatus', { id: status.id }))= t('views.users.actions.edit')
+                a.btn.btn-primary.mx-2(href=route('statusesEdit', { id: status.id }))= t('views.users.actions.edit')
               li
-                +buttonTo(route('deleteStatus', { id: status.id }), 'delete')(class="btn btn-danger" value=t('views.users.actions.delete'))
+                +buttonTo(route('statusesDelete', { id: status.id }), 'delete')(class="btn btn-danger" value=t('views.users.actions.delete'))
         
