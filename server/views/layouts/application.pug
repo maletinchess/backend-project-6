@@ -14,7 +14,7 @@ html(lang="en")
         a.d-flex.align-items-center.col-md-3.mb-2.mb-md-0.text-dark.text-decoration-none(href=route('root'))= t('appName')
           ul.nav.col-12.col-lg-auto.me-lg-auto.mb-2.justify-content-center.mb-md-0
             li
-              a.nav-link.px-2.text-secondary(href=route('users'))= t('layouts.application.users')
+              a.nav-link.px-2.text-secondary(href=route('usersIndex'))= t('layouts.application.users')
         .text-end
       ul.navbar-nav
         if isAuthenticated()
@@ -30,7 +30,7 @@ html(lang="en")
           li.nav-item
             a.nav-link(href=route('newSession'))= t('layouts.application.signIn')
           li.nav-item
-            a.nav-link(href=route('newUser'))= t('layouts.application.signUp')
+            a.nav-link(href=route('usersNew'))= t('layouts.application.signUp')
     .container.wrapper.flex-grow-1
       each messages, type in reply.flash() || []
         each message in messages

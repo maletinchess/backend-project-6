@@ -4,7 +4,7 @@ block header
   = t('views.users.new.signUp')
 
 block content
-  +formFor()(action=route('users') method='post')
+  +formFor()(action=route('usersCreate') method='post')
     +input(user, 'firstName', errors)(type="text")
     +input(user, 'lastName', errors)(type="text")
     +input(user, 'email', errors)(type="text")

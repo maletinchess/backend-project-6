@@ -4,22 +4,22 @@ import i18next from 'i18next';
 
 export default (app) => {
   app
-    .get('/users', { name: 'users' }, async (req, reply) => {
+    .get('/users', { name: 'usersIndex' }, async (req, reply) => {
       const users = await app.objection.models.user.query();
       reply.render('users/index', { users });
       return reply;
     })
-    .get('/users/new', { name: 'newUser' }, (req, reply) => {
+    .get('/users/new', { name: 'usersNew' }, (req, reply) => {
       const user = new app.objection.models.user();
       reply.render('users/new', { user });
     })
-    .get('/users/:id/edit', { name: 'editUser', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
+    .get('/users/:id/edit', { name: 'usersEdit', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
       const { id } = req.params;
       const userToEdit = await app.objection.models.user.query().findById(id);
       reply.render('users/edit', { userToEdit });
       return reply;
     })
-    .post('/users', async (req, reply) => {
+    .post('/users', { name: 'usersCreate' }, async (req, reply) => {
       const user = new app.objection.models.user();
       user.$set(req.body.data);
 
@@ -36,13 +36,13 @@ export default (app) => {
 
       return reply;
     })
-    .post('/users/:id', { name: 'updateUser', preValidation: app.authenticate }, async (req, reply) => {
+    .post('/users/:id', { name: 'usersUpdate', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
         const userToEdit = await app.objection.models.user.query().findById(id);
         await userToEdit.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.users.edit.success'));
-        reply.redirect(app.reverse('users'));
+        reply.redirect(app.reverse('usersIndex'));
         return reply;
       } catch (err) {
         console.log(err);
@@ -50,7 +50,7 @@ export default (app) => {
       }
     })
     .delete('/users/:id', {
-      name: 'deleteUser',
+      name: 'usersDelete',
       preValidation: app.checkEditAndDeletePermission,
     }, async (req, reply) => {
       try {
@@ -64,7 +64,7 @@ export default (app) => {
           req.logout();
           req.flash('success', i18next.t('flash.users.delete.success'));
         }
-        reply.redirect(app.reverse('users'));
+        reply.redirect(app.reverse('usersIndex'));
         return reply;
       } catch (err) {
         console.log(err);
