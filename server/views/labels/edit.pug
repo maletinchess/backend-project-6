@@ -4,6 +4,6 @@ block header
   =t('views.labels.editLabel.title')
 
 block content
-  +formFor()(action=route('updateLabel', { id: labelToEdit.id }) method='post')
+  +formFor()(action=route('labelsUpdate', { id: labelToEdit.id }) method='post')
     +input(labelToEdit, 'name', errors)(type="text")
     +submit(labelToEdit)(value=t('views.labels.editLabel.submit'))

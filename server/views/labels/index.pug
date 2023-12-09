@@ -2,7 +2,7 @@ extends ../layouts/application.pug
 
 block content
   h1= t('layouts.application.labels')
-  a.btn.btn-primary.mx-2(href=route('newLabel'))= t('views.labels.createNewLabelButton')
+  a.btn.btn-primary.mx-2(href=route('labelsNew'))= t('views.labels.createNewLabelButton')
   table.table.table-striped
     thead
       tr
@@ -18,6 +18,6 @@ block content
           td
             ul.nav
               li
-                a.btn.btn-primary.mx-2(href=route('editLabel', { id: label.id }))= t('views.labels.actions.edit')
+                a.btn.btn-primary.mx-2(href=route('labelsEdit', { id: label.id }))= t('views.labels.actions.edit')
               li
-                +buttonTo(route('deleteLabel', { id: label.id }), 'delete')(class="btn btn-danger" value=t('views.labels.actions.delete'))
+                +buttonTo(route('labelsDelete', { id: label.id }), 'delete')(class="btn btn-danger" value=t('views.labels.actions.delete'))
