@@ -28,7 +28,7 @@ export default (app) => {
       } catch (err) {
         const { data } = err;
         req.flash('error', i18next.t('flash.statuses.create.error'));
-        reply.render(app.reverse('getNewStatusPage'), { status, errors: data });
+        reply.render(app.reverse('statusesNew'), { status, errors: data });
       }
       return reply;
     })
