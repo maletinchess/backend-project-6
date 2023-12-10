@@ -2,6 +2,8 @@
 
 import i18next from 'i18next';
 
+import { isUserConnectedWithTask } from './helpers.js';
+
 export default (app) => {
   app
     .get('/users', { name: 'usersIndex' }, async (req, reply) => {
@@ -56,8 +58,7 @@ export default (app) => {
       try {
         const { id } = req.params;
         const user = await app.objection.models.user.query().findById(id);
-        const usersTasks = await user.$relatedQuery('tasks');
-        if (usersTasks.length > 0) {
+        if (await isUserConnectedWithTask(user)) {
           req.flash('error', i18next.t('flash.users.delete.error'));
         } else {
           await user.$query().delete();

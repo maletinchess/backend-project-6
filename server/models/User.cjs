@@ -38,6 +38,14 @@ module.exports = class User extends unique(BaseModel) {
           to: 'tasks.creatorId',
         },
       },
+      tasksExecutors: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: path.join(__dirname, 'Task.cjs'),
+        join: {
+          from: 'users.id',
+          to: 'tasks.executorId',
+        },
+      },
     };
   }
 
