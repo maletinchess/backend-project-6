@@ -26,6 +26,9 @@
     },
     "current": {
       "name": "process"
+    },
+    "statusConnectedWithTask": {
+      "name": "process 20%"
     }
   },
   "tasks": {

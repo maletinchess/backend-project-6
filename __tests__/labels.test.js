@@ -119,6 +119,22 @@ describe('test labels CRUD', () => {
     expect(tasks.length > 0).toBeTruthy();
   });
 
+  it('can not delete label binded with tasks', async () => {
+    const { binded } = testData.labels;
+    const bindedLabel = await models.label.query().findOne({ name: binded.name });
+    const { id } = bindedLabel;
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('labelsDelete', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+    const deletedLabel = await models.label.query().findById(id);
+    expect(deletedLabel).toBeDefined();
+  });
+
   afterEach(async () => {
     await knex('labels').truncate();
   });

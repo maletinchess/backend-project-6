@@ -1,5 +1,7 @@
 import i18next from 'i18next';
 
+import { checkIfEntityConnectedWithTask } from './helpers.js';
+
 export default (app) => {
   app
     .get('/labels', { name: 'labelsIndex', preValidation: app.authenticate }, async (req, reply) => {
@@ -48,7 +50,7 @@ export default (app) => {
       try {
         const { id } = req.params;
         const labelToDelete = await app.objection.models.label.query().findById(id);
-        if (await app.checkIfEntityConnectedWithTask(labelToDelete)) {
+        if (await checkIfEntityConnectedWithTask(labelToDelete)) {
           req.flash('error', i18next.t('flash.labels.delete.error'));
         } else {
           await labelToDelete.$query().delete();

@@ -99,6 +99,22 @@ describe('test statuses CRUD', () => {
     expect(deletedStatus).toBeUndefined();
   });
 
+  it('can not delete status connected with task', async () => {
+    const status = testData.statuses.statusConnectedWithTask;
+    const { id } = await models.status.query().findOne({ name: status.name });
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('statusesDelete', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const deletedStatus = await models.status.query().findById(id);
+    expect(deletedStatus).toBeDefined();
+  });
+
   afterEach(async () => {
     await knex('statuses').truncate();
   });

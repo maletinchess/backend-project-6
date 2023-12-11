@@ -1,5 +1,7 @@
 import i18next from 'i18next';
 
+import { checkIfEntityConnectedWithTask } from './helpers.js';
+
 export default (app) => {
   app
     .get('/statuses', { name: 'statusesIndex', preValidation: app.authenticate }, async (req, reply) => {
@@ -49,7 +51,7 @@ export default (app) => {
       try {
         const { id } = req.params;
         const statusToDelete = await app.objection.models.status.query().findById(id);
-        if (await app.checkIfEntityConnectedWithTask(statusToDelete)) {
+        if (await checkIfEntityConnectedWithTask(statusToDelete)) {
           req.flash('error', i18next.t('flash.statuses.delete.error'));
         } else {
           await statusToDelete.$query().delete();
