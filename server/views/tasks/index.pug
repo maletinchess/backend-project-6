@@ -2,14 +2,19 @@ extends ../layouts/application.pug
 
 block content
   h1= t('layouts.application.tasks')
-  a.btn.btn-primary.mx-2(href=route('tasksNew'))= t('views.tasks.createNewTaskButton')
-  .jumbotron.p-2
-    +formFor()(action=route('tasksIndex') method='get' class="form-inline")
-      +filterSelect('task', 'status', statuses)
-      +filterSelect('task', 'executor', usersNormalized)
-      +filterSelect('task', 'label', labels)
-      +checkbox('task','isCreatorUser')
-      +submit()(value=t('views.tasks.filter.submit'))
+  a.btn.btn-primary.mb-5(href=route('tasksNew'))= t('views.tasks.createNewTaskButton')
+  .card.shadow-sm
+    .card-body.p-4
+      +formFor()(action=route('tasksIndex') method='get' class="form-inline")
+        .row
+          .col-12.col-md
+            +filterSelect('task', 'status', statuses)
+          .col-12.col-md
+            +filterSelect('task', 'executor', usersNormalized)
+          .col-12.col-md
+            +filterSelect('task', 'label', labels)
+        +checkbox('task','isCreatorUser')
+        +submit()(value=t('views.tasks.filter.submit'))
   table.table.table-striped
     thead
       tr

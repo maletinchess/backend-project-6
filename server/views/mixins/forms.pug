@@ -71,9 +71,10 @@ mixin textarea(entity, propertyName, errors = {})
 mixin filterSelect(entityName, propertyName, items)
   - inputId = getInputId(propertyName)
   - isSelected = (item) => item.id == query[propertyName]
-  .form-group
-    label(for=inputId)= t(`views.${entityName}s.filter.${propertyName}`)
-      select.form-control(id=inputId name=propertyName)
+  - classLine = "input-group-text"
+  .input-group.mb-3
+    label(for=inputId, class=classLine)= t(`views.${entityName}s.filter.${propertyName}`)
+    select.form-select(id=inputId name=propertyName)
         option
         each item in items
           option(value = item.id selected=isSelected(item))= item.name 
@@ -81,6 +82,6 @@ mixin filterSelect(entityName, propertyName, items)
 mixin checkbox(entityName, propertyName)
   - inputId = getInputId(propertyName)
   - name = getInputName(propertyName)
-  .form-group.form-check
+  .form-group.form-check.mb-3
     input.form-check-input(id=inputId type='checkbox', name=propertyName, checked=(!!query[propertyName]))
     label.form-check-label(for=inputId)= t(`views.${entityName}s.filter.checkbox`)
