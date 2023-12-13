@@ -20,7 +20,7 @@ export default (app) => {
       const data = await getDataForTasksRoute(app, req, 'tasksEdit');
       const { taskToEdit } = data;
       if (!checkIfUserIsTaskCreator(req, taskToEdit)) {
-        req.flash('error', i18next.t('flash.tasks.update.error'));
+        req.flash('error', i18next.t('flash.tasks.edit.error'));
         reply.redirect(app.reverse('tasksIndex'));
         return reply;
       }
@@ -49,7 +49,7 @@ export default (app) => {
       } catch (err) {
         const dataForRender = await getDataForTasksRoute(app, req, 'tasksNew');
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        reply.render(app.reverse('tasksNew'), { ...dataForRender, errors: err.data });
+        reply.render('tasks/new', { ...dataForRender, errors: err.data });
       }
       return reply;
     })
@@ -62,8 +62,10 @@ export default (app) => {
         reply.redirect(app.reverse('tasksIndex'));
         return reply;
       } catch (err) {
-        await console.log(err);
-        throw (err);
+        const dataForRender = await getDataForTasksRoute(app, req, 'tasksEdit');
+        req.flash('error', i18next.t('flash.tasks.update.error'));
+        reply.render('tasks/edit', { ...dataForRender, errors: err.data });
+        return reply;
       }
     })
     .delete('/tasks/:id', { name: 'tasksDelete', preValidation: app.authenticate }, async (req, reply) => {
