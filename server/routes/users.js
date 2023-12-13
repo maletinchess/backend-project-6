@@ -15,7 +15,7 @@ export default (app) => {
       const user = new app.objection.models.user();
       reply.render('users/new', { user });
     })
-    .get('/users/:id/edit', { name: 'usersEdit', preValidation: app.checkEditAndDeletePermission }, async (req, reply) => {
+    .get('/users/:id/edit', { name: 'usersEdit', preValidation: app.checkEditAndDeleteUserPermission }, async (req, reply) => {
       const { id } = req.params;
       const userToEdit = await app.objection.models.user.query().findById(id);
       reply.render('users/edit', { userToEdit });
@@ -53,7 +53,7 @@ export default (app) => {
     })
     .delete('/users/:id', {
       name: 'usersDelete',
-      preValidation: app.checkEditAndDeletePermission,
+      preValidation: app.checkEditAndDeleteUserPermission,
     }, async (req, reply) => {
       try {
         const { id } = req.params;

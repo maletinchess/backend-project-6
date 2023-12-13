@@ -1,6 +1,8 @@
 import i18next from 'i18next';
 
-import { getDataForTasksRoute, createTaskTransaction, updateTaskTransaction } from './helpers.js';
+import {
+  getDataForTasksRoute, createTaskTransaction, updateTaskTransaction, checkIfUserIsTaskCreator,
+} from './helpers.js';
 
 export default (app) => {
   app
@@ -17,7 +19,7 @@ export default (app) => {
     .get('/tasks/:id/edit', { name: 'tasksEdit', preValidation: app.authenticate }, async (req, reply) => {
       const data = await getDataForTasksRoute(app, req, 'tasksEdit');
       const { taskToEdit } = data;
-      if (!app.checkIfUserIsTaskCreator(req.user.id, taskToEdit)) {
+      if (!checkIfUserIsTaskCreator(req, taskToEdit)) {
         req.flash('error', i18next.t('flash.tasks.update.error'));
         reply.redirect(app.reverse('tasksIndex'));
         return reply;
@@ -67,7 +69,7 @@ export default (app) => {
     .delete('/tasks/:id', { name: 'tasksDelete', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const taskToDelete = await getDataForTasksRoute(app, req, 'tasksDelete');
-        if (!app.checkIfUserIsTaskCreator(req.user.id, taskToDelete)) {
+        if (!checkIfUserIsTaskCreator(req, taskToDelete)) {
           req.flash('error', i18next.t('flash.tasks.delete.authError'));
         } else {
           await taskToDelete.$query().delete();

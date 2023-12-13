@@ -136,15 +136,12 @@ export const updateTaskTransaction = async (app, validData) => {
 
 export const isUserConnectedWithTask = async (user) => {
   const usersTasks = await user.$relatedQuery('tasks');
-  await console.log(usersTasks, 'LOG users-tasks');
   const usersExecutedTask = await user.$relatedQuery('tasksExecutors');
-  await console.log(usersExecutedTask, 'LOG executor TASKS');
   const connectedTasks = [...usersTasks, ...usersExecutedTask];
-  await console.log(connectedTasks, 'LOG TASKS');
   return connectedTasks.length > 0;
 };
 
-export const checkIfUserIsTaskCreator = async (req, task) => req.user.id === task.creatorId;
+export const checkIfUserIsTaskCreator = (req, task) => req.user.id === task.creatorId;
 
 export const checkIfEntityConnectedWithTask = async (entity) => {
   const connectedTasks = await entity.$relatedQuery('tasks');

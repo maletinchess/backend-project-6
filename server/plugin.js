@@ -124,7 +124,7 @@ const registerPlugins = async (app) => {
   // @ts-ignore
   )(...args));
 
-  app.decorate('checkEditAndDeletePermission', async (req, reply) => {
+  app.decorate('checkEditAndDeleteUserPermission', async (req, reply) => {
     const { id: paramsId } = req.params;
     const normalizedParamsId = parseInt(paramsId, 10);
 
@@ -133,13 +133,6 @@ const registerPlugins = async (app) => {
       reply.redirect(app.reverse('usersIndex'));
     }
   });
-
-  app.decorate('checkIfEntityConnectedWithTask', async (entity) => {
-    const connectedTasks = await entity.$relatedQuery('tasks');
-    return connectedTasks.length > 0;
-  });
-
-  app.decorate('checkIfUserIsTaskCreator', (userId, task) => userId === task.creatorId);
 
   await app.register(fastifyMethodOverride);
   await app.register(fastifyObjectionjs, {
