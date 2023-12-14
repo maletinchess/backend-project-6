@@ -2,22 +2,23 @@ import i18next from 'i18next';
 
 import {
   getDataForTasksRoute, createTaskTransaction, updateTaskTransaction, checkIfUserIsTaskCreator,
+  mapRouteNameToFunction,
 } from './helpers.js';
 
 export default (app) => {
   app
     .get('/tasks', { name: 'tasksIndex' }, async (req, reply) => {
-      const data = await getDataForTasksRoute(app, req, 'tasksIndex');
+      const data = await mapRouteNameToFunction('tasksIndex')(app, req);
       reply.render('tasks/index', data);
       return reply;
     })
     .get('/tasks/new', { name: 'tasksNew' }, async (req, reply) => {
-      const data = await getDataForTasksRoute(app, req, 'tasksNew');
+      const data = await mapRouteNameToFunction('tasksNew')(app);
       reply.render('tasks/new', data);
       return reply;
     })
     .get('/tasks/:id/edit', { name: 'tasksEdit', preValidation: app.authenticate }, async (req, reply) => {
-      const data = await getDataForTasksRoute(app, req, 'tasksEdit');
+      const data = await mapRouteNameToFunction('tasksEdit')(app, req);
       const { taskToEdit } = data;
       if (!checkIfUserIsTaskCreator(req, taskToEdit)) {
         req.flash('error', i18next.t('flash.tasks.edit.error'));
@@ -32,12 +33,13 @@ export default (app) => {
       return reply;
     })
     .get('/tasks/:id', { name: 'tasksShow', preValidation: app.authenticate }, async (req, reply) => {
-      const task = await getDataForTasksRoute(app, req, 'tasksShow');
+      const task = await mapRouteNameToFunction('tasksShow')(app, req);
       reply.render('tasks/show', { task });
       return reply;
     })
     .post('/tasks', { name: 'tasksCreate', preValidation: app.authenticate }, async (req, reply) => {
-      const data = await getDataForTasksRoute(app, req, 'tasksCreate');
+      const data = await mapRouteNameToFunction('tasksCreate')(req);
+      await console.log(data);
       const { graph, labels } = data;
 
       try {
@@ -54,7 +56,7 @@ export default (app) => {
       return reply;
     })
     .patch('/tasks/:id', { name: 'tasksUpdate', preValidation: app.authenticate }, async (req, reply) => {
-      const graph = await getDataForTasksRoute(app, req, 'tasksUpdate');
+      const graph = await mapRouteNameToFunction('tasksUpdate')(req);
 
       try {
         await updateTaskTransaction(app, graph);
@@ -70,7 +72,7 @@ export default (app) => {
     })
     .delete('/tasks/:id', { name: 'tasksDelete', preValidation: app.authenticate }, async (req, reply) => {
       try {
-        const taskToDelete = await getDataForTasksRoute(app, req, 'tasksDelete');
+        const taskToDelete = await mapRouteNameToFunction('tasksDelete')(app, req);
         if (!checkIfUserIsTaskCreator(req, taskToDelete)) {
           req.flash('error', i18next.t('flash.tasks.delete.authError'));
         } else {

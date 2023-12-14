@@ -23,6 +23,113 @@ const normalizeLabels = (labels) => {
   return labels.map((id) => ({ id: parseInt(id, 10) }));
 };
 
+const getCommonData = async (app) => {
+  const users = await app.objection.models.user.query();
+  const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
+  const statuses = await app.objection.models.status.query();
+  const labels = await app.objection.models.label.query();
+  await console.log(users);
+
+  return { usersNormalized, statuses, labels };
+};
+
+const getDataForTasksIndex = async (app, req) => {
+  const commonData = await getCommonData(app);
+  await console.log(commonData);
+  const task = new app.objection.models.task();
+
+  const { query } = req;
+  const tasksQuery = app.objection.models.task.query().withGraphJoined('[creator, status, executor, labels]');
+
+  if (query.executor) {
+    tasksQuery.modify('filterExecutor', query.executor);
+  }
+
+  if (query.status) {
+    tasksQuery.modify('filterStatus', query.status);
+  }
+
+  if (query.label) {
+    tasksQuery.modify('filterLabel', query.label);
+  }
+
+  if (query.isCreatorUser) {
+    tasksQuery.modify('filterCreator', req.user.id);
+  }
+
+  const [tasks] = await Promise.all([
+    tasksQuery,
+  ]);
+
+  return {
+    ...commonData, task, tasks, query,
+  };
+};
+
+const getDataForTasksNew = async (app) => {
+  const commonData = await getCommonData(app);
+  const task = new app.objection.models.task();
+  return { ...commonData, task };
+};
+
+const getDataForTasksShow = async (app, req) => {
+  const { id } = req.params;
+  const taskToShow = await app.objection.models.task
+    .query()
+    .findById(id)
+    .withGraphJoined('[creator, executor, status, labels]');
+  return taskToShow;
+};
+
+const getDataForTasksEdit = async (app, req) => {
+  const commonData = await getCommonData(app);
+  const { id } = req.params;
+  const taskToEdit = await app.objection.models.task.query().findById(id).withGraphJoined('[labels]');
+  return {
+    ...commonData, taskToEdit,
+  };
+};
+
+const getDataForTasksCreate = async (req) => {
+  const ids = normalizeIds(req.body.data);
+  const graph = { ...req.body.data, creatorId: req.user.id, ...ids };
+
+  return { graph, labels: normalizeLabels(req.body.data.labels) };
+};
+
+const getDataForTasksUpdate = (req) => {
+  const { id } = req.params;
+  const ids = normalizeIds(req.body.data);
+  const graph = {
+    ...req.body.data,
+    ...ids,
+    labels: normalizeLabels(req.body.data.labels),
+    id: parseInt(id, 10),
+  };
+  return graph;
+};
+
+const getDataForTasksDelete = async (app, req) => {
+  const { id } = req.params;
+  await console.log(id);
+  const taskToDelete = await app.objection.models.task.query().findById(id);
+  return taskToDelete;
+};
+
+export const mapRouteNameToFunction = (routeName) => {
+  const mapping = {
+    tasksIndex: getDataForTasksIndex,
+    tasksEdit: getDataForTasksEdit,
+    tasksNew: getDataForTasksNew,
+    tasksShow: getDataForTasksShow,
+    tasksCreate: getDataForTasksCreate,
+    tasksUpdate: getDataForTasksUpdate,
+    tasksDelete: getDataForTasksDelete,
+  };
+
+  return mapping[routeName];
+};
+
 export const getDataForTasksRoute = async (app, req, routeName) => {
   const users = await app.objection.models.user.query();
   const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
@@ -83,21 +190,18 @@ export const getDataForTasksRoute = async (app, req, routeName) => {
     case 'tasksCreate': {
       const ids = normalizeIds(req.body.data);
       const graph = { ...req.body.data, creatorId: req.user.id, ...ids };
-      console.log(req.body.data);
 
       return { graph, labels: normalizeLabels(req.body.data.labels) };
     }
 
     case 'tasksUpdate': {
       const ids = normalizeIds(req.body.data);
-      console.log(req.body.data);
       const graph = {
         ...req.body.data,
         ...ids,
         labels: normalizeLabels(req.body.data.labels),
         id: parseInt(id, 10),
       };
-      console.log(graph);
       return graph;
     }
 

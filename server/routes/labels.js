@@ -6,7 +6,6 @@ export default (app) => {
   app
     .get('/labels', { name: 'labelsIndex', preValidation: app.authenticate }, async (req, reply) => {
       const labels = await app.objection.models.label.query();
-      await console.log(labels);
       reply.render('labels/index', { labels });
       return reply;
     })
