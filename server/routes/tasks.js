@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 
 import {
-  getDataForTasksRoute, createTaskTransaction, updateTaskTransaction, checkIfUserIsTaskCreator,
+  createTaskTransaction, updateTaskTransaction, checkIfUserIsTaskCreator,
   mapRouteNameToFunction,
 } from './helpers.js';
 
@@ -49,7 +49,7 @@ export default (app) => {
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasksIndex'));
       } catch (err) {
-        const dataForRender = await getDataForTasksRoute(app, req, 'tasksNew');
+        const dataForRender = await mapRouteNameToFunction('tasksNew')(app);
         req.flash('error', i18next.t('flash.tasks.create.error'));
         reply.render('tasks/new', { ...dataForRender, errors: err.data });
       }
@@ -64,7 +64,7 @@ export default (app) => {
         reply.redirect(app.reverse('tasksIndex'));
         return reply;
       } catch (err) {
-        const dataForRender = await getDataForTasksRoute(app, req, 'tasksEdit');
+        const dataForRender = await mapRouteNameToFunction('tasksEdit')(app, req);
         req.flash('error', i18next.t('flash.tasks.update.error'));
         reply.render('tasks/edit', { ...dataForRender, errors: err.data });
         return reply;
