@@ -1,7 +1,9 @@
 import fastify from 'fastify';
 
 import init from '../server/plugin.js';
-import { getTestData, prepareData, getCookies } from './helpers/index.js';
+import {
+  getTestData, prepareData, getCookies, getEntityIdByData,
+} from './helpers/index.js';
 
 describe('test labels CRUD', () => {
   let app;
@@ -48,8 +50,7 @@ describe('test labels CRUD', () => {
   });
 
   it('get edit label page', async () => {
-    const { current } = testData.labels;
-    const { id } = await models.label.query().findOne({ name: current.name });
+    const id = await getEntityIdByData(testData.labels.current, models.label);
 
     const response = await app.inject({
       method: 'GET',
@@ -78,8 +79,7 @@ describe('test labels CRUD', () => {
   });
 
   it('update label', async () => {
-    const { current } = testData.labels;
-    const { id } = await models.label.query().findOne({ name: current.name });
+    const id = await getEntityIdByData(testData.labels.current, models.label);
     const params = testData.labels.toUpdate;
 
     const response = await app.inject({
@@ -98,8 +98,7 @@ describe('test labels CRUD', () => {
   });
 
   it('delete label', async () => {
-    const { current } = testData.labels;
-    const { id } = await models.label.query().findOne({ name: current.name });
+    const id = await getEntityIdByData(testData.labels.current, models.label);
 
     const response = await app.inject({
       method: 'DELETE',
@@ -120,9 +119,7 @@ describe('test labels CRUD', () => {
   });
 
   it('can not delete label binded with tasks', async () => {
-    const { binded } = testData.labels;
-    const bindedLabel = await models.label.query().findOne({ name: binded.name });
-    const { id } = bindedLabel;
+    const id = await getEntityIdByData(testData.labels.binded, models.label);
 
     const response = await app.inject({
       method: 'DELETE',
