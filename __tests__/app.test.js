@@ -6,15 +6,13 @@ import {
 
 import fastify from 'fastify';
 import init from '../server/plugin.js';
+import { makeApp } from './helpers/index.js';
 
 describe('requests', () => {
   let app;
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
+    app = makeApp(fastify);
     await init(app);
   });
 

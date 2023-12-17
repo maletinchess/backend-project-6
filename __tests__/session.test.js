@@ -2,7 +2,7 @@
 
 import fastify from 'fastify';
 import init from '../server/plugin.js';
-import { getTestData, prepareData } from './helpers/index.js';
+import { getTestData, makeApp, prepareData } from './helpers/index.js';
 
 describe('test session', () => {
   let app;
@@ -10,10 +10,7 @@ describe('test session', () => {
   let testData;
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
+    app = makeApp(fastify);
     await init(app);
     knex = app.objection.knex;
     await knex.migrate.latest();

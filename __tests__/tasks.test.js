@@ -2,7 +2,7 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import {
-  getTestData, prepareData, getCookies, getEntityIdByData, buildResponse,
+  getTestData, prepareData, getCookies, getEntityIdByData, buildResponse, makeApp,
 } from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
@@ -13,10 +13,7 @@ describe('test tasks CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
+    app = makeApp(fastify);
     await init(app);
     knex = app.objection.knex;
     models = app.objection.models;

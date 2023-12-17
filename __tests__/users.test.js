@@ -6,7 +6,7 @@ import fastify from 'fastify';
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
 import {
-  getTestData, prepareData, getCookies, getUserIdByData,
+  getTestData, prepareData, getCookies, getUserIdByData, makeApp,
 } from './helpers/index.js';
 
 describe('test users CRUD', () => {
@@ -17,10 +17,7 @@ describe('test users CRUD', () => {
   const testData = getTestData();
 
   beforeAll(async () => {
-    app = fastify({
-      exposeHeadRoutes: false,
-      logger: { target: 'pino-pretty' },
-    });
+    app = makeApp(fastify);
     await init(app);
     knex = app.objection.knex;
     models = app.objection.models;

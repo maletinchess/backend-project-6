@@ -68,3 +68,8 @@ export const buildResponse = async (app, method, routeName, cookies = {}, params
 
   return response;
 };
+
+export const makeApp = (fastify) => fastify({
+  exposeHeadRoutes: false,
+  logger: { target: 'pino-pretty' },
+});
