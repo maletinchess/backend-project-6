@@ -2,7 +2,7 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import {
-  getTestData, prepareData, getCookies, getEntityIdByData,
+  getTestData, prepareData, getCookies, getEntityIdByData, buildResponse,
 } from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
@@ -34,24 +34,13 @@ describe('test tasks CRUD', () => {
   });
 
   it('tasks', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('tasksIndex'),
-      cookies: cookie,
-      query: {
-        label: '3',
-      },
-    });
+    const response = await buildResponse(app, 'GET', 'tasksIndex', cookie);
 
     expect(response.statusCode).toBe(200);
   });
 
   it('get new task page', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('tasksNew'),
-      cookies: cookie,
-    });
+    const response = await buildResponse(app, 'GET', 'tasksNew', cookie);
 
     expect(response.statusCode).toBe(200);
   });
@@ -59,25 +48,15 @@ describe('test tasks CRUD', () => {
   it('get edit-task page', async () => {
     const id = await getEntityIdByData(testData.tasks.current, models.task);
 
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('tasksEdit', { id }),
-      cookies: cookie,
-    });
+    const response = await buildResponse(app, 'GET', 'tasksEdit', cookie, { id });
 
     expect(response.statusCode).toBe(200);
   });
 
   it('create task', async () => {
     const params = testData.tasks.new;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('tasksCreate'),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
+
+    const response = await buildResponse(app, 'POST', 'tasksCreate', cookie, { data: params });
 
     expect(response.statusCode).toBe(302);
 
@@ -87,14 +66,8 @@ describe('test tasks CRUD', () => {
 
   it('create task with labels', async () => {
     const params = testData.tasks.newTaskWithLabels;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('tasksCreate'),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
+
+    const response = await buildResponse(app, 'POST', 'tasksCreate', cookie, { data: params });
 
     expect(response.statusCode).toBe(302);
 
@@ -122,14 +95,7 @@ describe('test tasks CRUD', () => {
     const id = await getEntityIdByData(testData.tasks.current, models.task);
 
     const params = testData.tasks.toUpdate;
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('tasksUpdate', { id }),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
+    const response = await buildResponse(app, 'PATCH', 'tasksUpdate', cookie, { data: params, id });
 
     expect(response.statusCode).toBe(302);
 
@@ -140,11 +106,7 @@ describe('test tasks CRUD', () => {
   it('user can delete task if he is creator', async () => {
     const id = await getEntityIdByData(testData.tasks.taskToDelete, models.task);
 
-    const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('tasksDelete', { id }),
-      cookies: cookie,
-    });
+    const response = await buildResponse(app, 'DELETE', 'tasksDelete', cookie, { id });
 
     expect(response.statusCode).toBe(302);
     const deletedTask = await models.task.query().findById(id);
