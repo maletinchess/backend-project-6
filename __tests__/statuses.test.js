@@ -2,7 +2,7 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import {
-  getTestData, prepareData, getCookies, makeApp,
+  getTestData, prepareData, getCookies, makeApp, buildResponse, getEntityIdByData,
 } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
@@ -27,90 +27,63 @@ describe('test statuses CRUD', () => {
   });
 
   it('statuses get', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('statusesIndex'),
-      cookies: cookie,
-    });
+    const response = await buildResponse(app, 'GET', 'statusesIndex', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
   it('statuses get new status page', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('statusesNew'),
-      cookies: cookie,
-    });
+    const response = await buildResponse(app, 'GET', 'statusesNew', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
   it('create new status', async () => {
-    const params = testData.statuses.new;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('statusesCreate'),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
+    const data = testData.statuses.new;
+    const response = await buildResponse(app, 'POST', 'statusesCreate', { data, cookies: cookie });
 
     expect(response.statusCode).toBe(302);
 
-    const createdSatus = await models.status.query().findOne({ name: params.name });
-    expect(createdSatus).toMatchObject(params);
+    const createdSatus = await models.status.query().findOne({ name: data.name });
+    expect(createdSatus).toMatchObject(data);
   });
 
   it('update status', async () => {
-    const params = testData.statuses.toUpdate;
+    const data = testData.statuses.toUpdate;
     const currentStatus = testData.statuses.current;
-    const { id } = await models.status.query().findOne({ name: currentStatus.name });
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('statusesUpdate', { id }),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
+
+    const statusToUpdateId = await getEntityIdByData(currentStatus, models.status);
+
+    const response = await buildResponse(app, 'POST', 'statusesUpdate', { paramsId: statusToUpdateId, data, cookies: cookie });
 
     expect(response.statusCode).toBe(302);
 
-    const updatedStatus = await models.status.query().findById(id);
-    expect(updatedStatus).toMatchObject(params);
+    const updatedStatus = await models.status.query().findById(statusToUpdateId);
+    expect(updatedStatus).toMatchObject(data);
   });
 
   it('delete status', async () => {
     const currentStatus = testData.statuses.current;
-    const { id } = await models.status.query().findOne({ name: currentStatus.name });
+    const statusToDeleteId = await getEntityIdByData(currentStatus, models.status);
 
-    const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('statusesDelete', { id }),
-      cookies: cookie,
-    });
+    const response = await buildResponse(app, 'DELETE', 'statusesDelete', { paramsId: statusToDeleteId, cookies: cookie });
 
     expect(response.statusCode).toBe(302);
 
-    const deletedStatus = await models.status.query().findById(id);
+    const deletedStatus = await models.status.query().findById(statusToDeleteId);
     expect(deletedStatus).toBeUndefined();
   });
 
   it('can not delete status connected with task', async () => {
-    const status = testData.statuses.statusConnectedWithTask;
-    const { id } = await models.status.query().findOne({ name: status.name });
+    const statusToDelete = testData.statuses.statusConnectedWithTask;
 
-    const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('statusesDelete', { id }),
-      cookies: cookie,
-    });
+    const statusToDeleteId = await getEntityIdByData(statusToDelete, models.status);
+
+    const response = await buildResponse(app, 'DELETE', 'statusesDelete', { cookies: cookie, paramsId: statusToDeleteId });
 
     expect(response.statusCode).toBe(302);
 
-    const deletedStatus = await models.status.query().findById(id);
+    const deletedStatus = await models.status.query().findById(statusToDeleteId);
     expect(deletedStatus).toBeDefined();
   });
 
