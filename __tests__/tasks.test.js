@@ -31,44 +31,44 @@ describe('test tasks CRUD', () => {
   });
 
   it('tasks', async () => {
-    const response = await buildResponse(app, 'GET', 'tasksIndex', cookie);
+    const response = await buildResponse(app, 'GET', 'tasksIndex', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
   it('get new task page', async () => {
-    const response = await buildResponse(app, 'GET', 'tasksNew', cookie);
+    const response = await buildResponse(app, 'GET', 'tasksNew', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
   it('get edit-task page', async () => {
-    const id = await getEntityIdByData(testData.tasks.current, models.task);
+    const taskToEditId = await getEntityIdByData(testData.tasks.current, models.task);
 
-    const response = await buildResponse(app, 'GET', 'tasksEdit', cookie, { id });
+    const response = await buildResponse(app, 'GET', 'tasksEdit', { cookies: cookie, paramsId: taskToEditId });
 
     expect(response.statusCode).toBe(200);
   });
 
   it('create task', async () => {
-    const params = testData.tasks.new;
+    const data = testData.tasks.new;
 
-    const response = await buildResponse(app, 'POST', 'tasksCreate', cookie, { data: params });
+    const response = await buildResponse(app, 'POST', 'tasksCreate', { cookies: cookie, data });
 
     expect(response.statusCode).toBe(302);
 
-    const createdTask = await models.task.query().findOne({ name: params.name });
-    expect(createdTask).toMatchObject(params);
+    const createdTask = await models.task.query().findOne({ name: data.name });
+    expect(createdTask).toMatchObject(data);
   });
 
   it('create task with labels', async () => {
-    const params = testData.tasks.newTaskWithLabels;
+    const data = testData.tasks.newTaskWithLabels;
 
-    const response = await buildResponse(app, 'POST', 'tasksCreate', cookie, { data: params });
+    const response = await buildResponse(app, 'POST', 'tasksCreate', { cookies: cookie, data });
 
     expect(response.statusCode).toBe(302);
 
-    const taskWithoutGraph = await models.task.query().findOne({ name: params.name });
+    const taskWithoutGraph = await models.task.query().findOne({ name: data.name });
     const { id } = taskWithoutGraph;
     const createdTaskWithGraph = await models.task.query().findById(id).withGraphJoined('[labels, creator, status]');
 
@@ -89,24 +89,24 @@ describe('test tasks CRUD', () => {
   });
 
   it('update task - status, description, name', async () => {
-    const id = await getEntityIdByData(testData.tasks.current, models.task);
+    const taskToUpdateId = await getEntityIdByData(testData.tasks.current, models.task);
 
-    const params = testData.tasks.toUpdate;
-    const response = await buildResponse(app, 'PATCH', 'tasksUpdate', cookie, { data: params, id });
+    const data = testData.tasks.toUpdate;
+    const response = await buildResponse(app, 'PATCH', 'tasksUpdate', { cookies: cookie, data, paramsId: taskToUpdateId });
 
     expect(response.statusCode).toBe(302);
 
-    const updatedTask = await models.task.query().findById(id);
-    expect(updatedTask).toMatchObject(params);
+    const updatedTask = await models.task.query().findById(taskToUpdateId);
+    expect(updatedTask).toMatchObject(data);
   });
 
   it('user can delete task if he is creator', async () => {
-    const id = await getEntityIdByData(testData.tasks.taskToDelete, models.task);
+    const taskToDeleteId = await getEntityIdByData(testData.tasks.taskToDelete, models.task);
 
-    const response = await buildResponse(app, 'DELETE', 'tasksDelete', cookie, { id });
+    const response = await buildResponse(app, 'DELETE', 'tasksDelete', { cookies: cookie, paramsId: taskToDeleteId });
 
     expect(response.statusCode).toBe(302);
-    const deletedTask = await models.task.query().findById(id);
+    const deletedTask = await models.task.query().findById(taskToDeleteId);
     expect(deletedTask).toBeUndefined();
   });
 

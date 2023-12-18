@@ -6,7 +6,7 @@ import fastify from 'fastify';
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
 import {
-  getTestData, prepareData, getCookies, getUserIdByData, makeApp,
+  getTestData, prepareData, getCookies, getUserIdByData, makeApp, buildResponse,
 } from './helpers/index.js';
 
 describe('test users CRUD', () => {
@@ -35,111 +35,81 @@ describe('test users CRUD', () => {
   });
 
   it('index', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('usersIndex'),
-    });
+    const response = await buildResponse(app, 'GET', 'usersIndex');
 
     expect(response.statusCode).toBe(200);
   });
 
   it('new', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('usersNew'),
-    });
+    const response = await buildResponse(app, 'GET', 'usersNew');
 
     expect(response.statusCode).toBe(200);
   });
 
   it('create', async () => {
-    const params = testData.users.new;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('usersCreate'),
-      payload: {
-        data: params,
-      },
-    });
+    const data = testData.users.new;
+
+    const response = await buildResponse(app, 'POST', 'usersCreate', { data });
 
     expect(response.statusCode).toBe(302);
     const expected = {
-      ..._.omit(params, 'password'),
-      passwordDigest: encrypt(params.password),
+      ..._.omit(data, 'password'),
+      passwordDigest: encrypt(data.password),
     };
-    const user = await models.user.query().findOne({ email: params.email });
+    const user = await models.user.query().findOne({ email: data.email });
     expect(user).toMatchObject(expected);
   });
 
   it('user update his profile', async () => {
     const existingUser = testData.users.existing;
-    const params = testData.users.toUpdate;
-    const user = await models.user.query().findOne({ email: existingUser.email });
-    const { id } = user;
-    const response = await app.inject({
-      method: 'POST',
-      url: app.reverse('usersUpdate', { id }),
-      payload: {
-        data: params,
-      },
-      cookies: cookie,
-    });
+    const data = testData.users.toUpdate;
+    const userToUpdateId = await getUserIdByData(existingUser, models.user);
+
+    const response = await buildResponse(app, 'POST', 'usersUpdate', { data, cookies: cookie, paramsId: userToUpdateId });
 
     expect(response.statusCode).toBe(302);
 
-    const updatedUser = await models.user.query().findById(id);
+    const updatedUser = await models.user.query().findById(userToUpdateId);
 
     const expected = {
-      ..._.omit(params, 'password'),
-      passwordDigest: encrypt(params.password),
+      ..._.omit(data, 'password'),
+      passwordDigest: encrypt(data.password),
     };
     expect(updatedUser).toMatchObject(expected);
   });
 
   it('user can not delete his profile if he has tasks', async () => {
-    const id = await getUserIdByData(testData.users.existing, models.user);
+    const userToDeleteId = await getUserIdByData(testData.users.existing, models.user);
 
-    const responseDelete = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('usersDelete', { id }),
-      cookies: cookie,
-    });
+    const responseDelete = await buildResponse(app, 'DELETE', 'usersDelete', { cookies: cookie, paramsId: userToDeleteId });
 
     expect(responseDelete.statusCode).toBe(302);
 
-    const removedUser = await models.user.query().findById(id);
+    const removedUser = await models.user.query().findById(userToDeleteId);
     expect(removedUser).toBeDefined();
   });
 
   it('user can delete his profile if he has not tasks', async () => {
-    const id = await getUserIdByData(testData.users.userWithoutTasks, models.user);
+    const userToDeleteId = await getUserIdByData(testData.users.userWithoutTasks, models.user);
 
     const newCookie = await getCookies(app, testData.users.userWithoutTasks);
 
-    const responseDelete = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('usersDelete', { id }),
-      cookies: newCookie,
-    });
+    const responseDelete = await buildResponse(app, 'DELETE', 'usersDelete', { cookies: newCookie, paramsId: userToDeleteId });
 
     expect(responseDelete.statusCode).toBe(302);
 
-    const removedUser = await models.user.query().findById(id);
+    const removedUser = await models.user.query().findById(userToDeleteId);
     expect(removedUser).toBeUndefined();
   });
 
   it('user can not delete another user profile', async () => {
-    const id = await getUserIdByData(testData.users.userWithoutTasks, models.user);
+    const userToDeleteId = await getUserIdByData(testData.users.userWithoutTasks, models.user);
 
-    const responseDelete = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('usersDelete', { id }),
-      cookies: cookie,
-    });
+    const responseDelete = await buildResponse(app, 'DELETE', 'usersDelete', { cookies: cookie, paramsId: userToDeleteId });
 
     expect(responseDelete.statusCode).toBe(302);
 
-    const removedUser = await models.user.query().findById(id);
+    const removedUser = await models.user.query().findById(userToDeleteId);
     expect(removedUser).toBeDefined();
   });
 

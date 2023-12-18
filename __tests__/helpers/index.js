@@ -54,16 +54,19 @@ export const getEntityIdByData = async (data, entity) => {
   return id;
 };
 
-export const buildResponse = async (app, method, routeName, cookies = {}, params = {}) => {
-  const url = params.id ? app.reverse(routeName, { id: params.id }) : app.reverse(routeName);
-  await console.log(url);
+export const buildResponse = async (app, method, routeName, options = {}) => {
+  await console.log(options);
+  const url = options.paramsId
+    ? app.reverse(routeName, { id: options.paramsId })
+    : app.reverse(routeName);
   const response = await app.inject({
     method,
     url,
     payload: {
-      data: params.data ?? {},
+      data: options.data ?? {},
     },
-    cookies,
+    cookies: options.cookies ?? {},
+    query: options.query ?? {},
   });
 
   return response;
