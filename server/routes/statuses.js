@@ -6,7 +6,6 @@ export default (app) => {
   app
     .get('/statuses', { name: 'statusesIndex', preValidation: app.authenticate }, async (req, reply) => {
       const statuses = await app.objection.models.status.query();
-      await console.log(statuses);
       reply.render('statuses/index', { statuses });
       return reply;
     })

@@ -39,7 +39,6 @@ export default (app) => {
     })
     .post('/tasks', { name: 'tasksCreate', preValidation: app.authenticate }, async (req, reply) => {
       const data = await mapRouteNameToFunction('tasksCreate')(req);
-      await console.log(data);
       const { graph, labels } = data;
 
       try {

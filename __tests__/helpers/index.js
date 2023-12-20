@@ -55,7 +55,6 @@ export const getEntityIdByData = async (data, entity) => {
 };
 
 export const buildResponse = async (app, method, routeName, options = {}) => {
-  await console.log(options);
   const url = options.paramsId
     ? app.reverse(routeName, { id: options.paramsId })
     : app.reverse(routeName);

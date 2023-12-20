@@ -28,14 +28,12 @@ const getCommonData = async (app) => {
   const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
   const statuses = await app.objection.models.status.query();
   const labels = await app.objection.models.label.query();
-  await console.log(users);
 
   return { usersNormalized, statuses, labels };
 };
 
 const getDataForTasksIndex = async (app, req) => {
   const commonData = await getCommonData(app);
-  await console.log(commonData);
   const task = new app.objection.models.task();
 
   const { query } = req;
@@ -111,7 +109,6 @@ const getDataForTasksUpdate = (req) => {
 
 const getDataForTasksDelete = async (app, req) => {
   const { id } = req.params;
-  await console.log(id);
   const taskToDelete = await app.objection.models.task.query().findById(id);
   return taskToDelete;
 };
