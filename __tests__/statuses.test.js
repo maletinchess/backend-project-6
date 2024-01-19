@@ -2,7 +2,7 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import {
-  getTestData, prepareData, getCookies, makeApp, buildResponse, getEntityIdByData,
+  getTestData, prepareData, signIn, makeApp, buildResponse, getEntityIdByData,
 } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
@@ -16,29 +16,28 @@ describe('test statuses CRUD', () => {
     app = makeApp(fastify);
     await init(app);
     knex = app.objection.knex;
+    await knex.migrate.latest();
+    await prepareData(app);
     models = app.objection.models;
   });
 
   beforeEach(async () => {
-    await knex.migrate.latest();
-    await prepareData(app);
-
-    cookie = await getCookies(app, testData.users.existing);
+    cookie = await signIn(app, app.reverse('session'), testData.users.existing);
   });
 
-  it('statuses get', async () => {
+  it('should return 200 on GET statuses', async () => {
     const response = await buildResponse(app, 'GET', 'statusesIndex', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('statuses get new status page', async () => {
+  it('should return 200 on GET statusesNew', async () => {
     const response = await buildResponse(app, 'GET', 'statusesNew', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('create new status', async () => {
+  it('should create new status on POST statusesCreate', async () => {
     const data = testData.statuses.new;
     const response = await buildResponse(app, 'POST', 'statusesCreate', { data, cookies: cookie });
 
@@ -48,7 +47,7 @@ describe('test statuses CRUD', () => {
     expect(createdSatus).toMatchObject(data);
   });
 
-  it('update status', async () => {
+  it('should update status on POST statusesUpdate', async () => {
     const data = testData.statuses.toUpdate;
     const currentStatus = testData.statuses.current;
 
@@ -62,9 +61,9 @@ describe('test statuses CRUD', () => {
     expect(updatedStatus).toMatchObject(data);
   });
 
-  it('delete status', async () => {
-    const currentStatus = testData.statuses.current;
-    const statusToDeleteId = await getEntityIdByData(currentStatus, models.status);
+  it('should delete status on DELETE statusesDelete', async () => {
+    const { statusToDelete } = testData.statuses;
+    const statusToDeleteId = await getEntityIdByData(statusToDelete, models.status);
 
     const response = await buildResponse(app, 'DELETE', 'statusesDelete', { paramsId: statusToDeleteId, cookies: cookie });
 
@@ -74,7 +73,7 @@ describe('test statuses CRUD', () => {
     expect(deletedStatus).toBeUndefined();
   });
 
-  it('can not delete status connected with task', async () => {
+  it('should not delete status connected with task', async () => {
     const statusToDelete = testData.statuses.statusConnectedWithTask;
 
     const statusToDeleteId = await getEntityIdByData(statusToDelete, models.status);
@@ -87,11 +86,8 @@ describe('test statuses CRUD', () => {
     expect(deletedStatus).toBeDefined();
   });
 
-  afterEach(async () => {
-    await knex('statuses').truncate();
-  });
-
   afterAll(async () => {
+    await knex('statuses').truncate();
     await app.close();
   });
 });

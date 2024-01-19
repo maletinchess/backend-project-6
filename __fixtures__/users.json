@@ -10,5 +10,13 @@
   {
     "email": "nona_murray@yahoo.com",
     "passwordDigest": "760391e7dceb3cf65ee23e97ca3db8c1515d18c3434b003c1fd781053afcf86f"
+  },
+  {
+    "email": "robert@chase.com",
+    "passwordDigest": "3d49aa640d73f6a0fdd53f63a4f8249c868c9e4d87779da8e88125567d2efc30"
+  },
+  {
+    "email": "eric@forman.com",
+    "passwordDigest": "7f905f28f46f6f0cae03bbfc5944035f86aa762a7285003c5716d3590cf397d4"
   }
 ]

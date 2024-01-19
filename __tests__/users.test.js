@@ -5,8 +5,9 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.cjs';
+
 import {
-  getTestData, prepareData, getCookies, getUserIdByData, makeApp, buildResponse,
+  getTestData, prepareData, signIn, getUserIdByData, makeApp, buildResponse,
 } from './helpers/index.js';
 
 describe('test users CRUD', () => {
@@ -20,33 +21,28 @@ describe('test users CRUD', () => {
     app = makeApp(fastify);
     await init(app);
     knex = app.objection.knex;
+    await knex.migrate.latest();
+    await prepareData(app);
     models = app.objection.models;
-
-    // TODO: пока один раз перед тестами
-    // тесты не должны зависеть друг от друга
-    // перед каждым тестом выполняем миграции
-    // и заполняем БД тестовыми данными
   });
 
   beforeEach(async () => {
-    await knex.migrate.latest();
-    await prepareData(app);
-    cookie = await getCookies(app, testData.users.existing);
+    cookie = await signIn(app, app.reverse('session'), testData.users.existing);
   });
 
-  it('index', async () => {
+  it('should return 200 on GET users', async () => {
     const response = await buildResponse(app, 'GET', 'usersIndex');
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('new', async () => {
+  it('should return 200 on GET usersNew', async () => {
     const response = await buildResponse(app, 'GET', 'usersNew');
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('create', async () => {
+  it('should create user on POST usersCreate', async () => {
     const data = testData.users.new;
 
     const response = await buildResponse(app, 'POST', 'usersCreate', { data });
@@ -60,7 +56,7 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
-  it('user update his profile', async () => {
+  it('should update user profile on POST updateUsers', async () => {
     const existingUser = testData.users.existing;
     const data = testData.users.toUpdate;
     const userToUpdateId = await getUserIdByData(existingUser, models.user);
@@ -78,8 +74,8 @@ describe('test users CRUD', () => {
     expect(updatedUser).toMatchObject(expected);
   });
 
-  it('user can not delete his profile if he has tasks', async () => {
-    const userToDeleteId = await getUserIdByData(testData.users.existing, models.user);
+  it('should not delete user\'s profile if he has tasks', async () => {
+    const userToDeleteId = await getUserIdByData(testData.users.userWithTasksToDelete, models.user);
 
     const responseDelete = await buildResponse(app, 'DELETE', 'usersDelete', { cookies: cookie, paramsId: userToDeleteId });
 
@@ -89,10 +85,13 @@ describe('test users CRUD', () => {
     expect(removedUser).toBeDefined();
   });
 
-  it('user can delete his profile if he has not tasks', async () => {
+  it('should delete user\'s profile if he has not tasks', async () => {
     const userToDeleteId = await getUserIdByData(testData.users.userWithoutTasks, models.user);
 
-    const newCookie = await getCookies(app, testData.users.userWithoutTasks);
+    const { anotherUserWithoutTasks } = testData.users;
+    await console.log(encrypt(anotherUserWithoutTasks.password));
+
+    const newCookie = await signIn(app, app.reverse('session'), testData.users.userWithoutTasks);
 
     const responseDelete = await buildResponse(app, 'DELETE', 'usersDelete', { cookies: newCookie, paramsId: userToDeleteId });
 
@@ -102,8 +101,11 @@ describe('test users CRUD', () => {
     expect(removedUser).toBeUndefined();
   });
 
-  it('user can not delete another user profile', async () => {
-    const userToDeleteId = await getUserIdByData(testData.users.userWithoutTasks, models.user);
+  it('user should not delete another user profile', async () => {
+    const userToDeleteId = await getUserIdByData(
+      testData.users.anotherUserWithoutTasks,
+      models.user,
+    );
 
     const responseDelete = await buildResponse(app, 'DELETE', 'usersDelete', { cookies: cookie, paramsId: userToDeleteId });
 
@@ -113,14 +115,8 @@ describe('test users CRUD', () => {
     expect(removedUser).toBeDefined();
   });
 
-  afterEach(async () => {
-    // Пока Segmentation fault: 11
-    // после каждого теста откатываем миграции
-    // await knex.migrate.rollback();
-    await knex('users').truncate();
-  });
-
   afterAll(async () => {
+    await knex('users').truncate();
     await app.close();
   });
 });

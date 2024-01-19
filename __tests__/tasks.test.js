@@ -2,7 +2,7 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import {
-  getTestData, prepareData, getCookies, getEntityIdByData, buildResponse, makeApp,
+  getTestData, prepareData, signIn, getEntityIdByData, buildResponse, makeApp,
 } from './helpers/index.js';
 
 describe('test tasks CRUD', () => {
@@ -16,33 +16,28 @@ describe('test tasks CRUD', () => {
     app = makeApp(fastify);
     await init(app);
     knex = app.objection.knex;
+    await knex.migrate.latest();
+    await prepareData(app);
     models = app.objection.models;
-
-    // TODO: пока один раз перед тестами
-    // тесты не должны зависеть друг от друга
-    // перед каждым тестом выполняем миграции
-    // и заполняем БД тестовыми данными
   });
 
   beforeEach(async () => {
-    await knex.migrate.latest();
-    await prepareData(app);
-    cookie = await getCookies(app, testData.users.existing);
+    cookie = await signIn(app, app.reverse('session'), testData.users.existing);
   });
 
-  it('tasks', async () => {
+  it('should return 200 on GET tasks', async () => {
     const response = await buildResponse(app, 'GET', 'tasksIndex', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('get new task page', async () => {
+  it('should return 200 on GET tasksNew', async () => {
     const response = await buildResponse(app, 'GET', 'tasksNew', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('get edit-task page', async () => {
+  it('should return 200 on GET tasksEdit', async () => {
     const taskToEditId = await getEntityIdByData(testData.tasks.current, models.task);
 
     const response = await buildResponse(app, 'GET', 'tasksEdit', { cookies: cookie, paramsId: taskToEditId });
@@ -50,7 +45,7 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('create task', async () => {
+  it('should create task on POST tasksCreate', async () => {
     const data = testData.tasks.new;
 
     const response = await buildResponse(app, 'POST', 'tasksCreate', { cookies: cookie, data });
@@ -61,7 +56,7 @@ describe('test tasks CRUD', () => {
     expect(createdTask).toMatchObject(data);
   });
 
-  it('create task with labels', async () => {
+  it('should create task with labels', async () => {
     const data = testData.tasks.newTaskWithLabels;
 
     const response = await buildResponse(app, 'POST', 'tasksCreate', { cookies: cookie, data });
@@ -110,11 +105,8 @@ describe('test tasks CRUD', () => {
     expect(deletedTask).toBeUndefined();
   });
 
-  afterEach(async () => {
-    await knex('tasks').truncate();
-  });
-
   afterAll(async () => {
+    await knex('tasks').truncate();
     await app.close();
   });
 });

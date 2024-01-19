@@ -2,7 +2,7 @@ import fastify from 'fastify';
 
 import init from '../server/plugin.js';
 import {
-  getTestData, prepareData, getCookies, getEntityIdByData, makeApp, buildResponse,
+  getTestData, prepareData, signIn, getEntityIdByData, makeApp, buildResponse,
 } from './helpers/index.js';
 
 describe('test labels CRUD', () => {
@@ -16,29 +16,28 @@ describe('test labels CRUD', () => {
     app = makeApp(fastify);
     await init(app);
     knex = app.objection.knex;
+    await knex.migrate.latest();
+    await prepareData(app);
     models = app.objection.models;
   });
 
   beforeEach(async () => {
-    await knex.migrate.latest();
-    await prepareData(app);
-
-    cookie = await getCookies(app, testData.users.existing);
+    cookie = await signIn(app, app.reverse('session'), testData.users.existing);
   });
 
-  it('labels get', async () => {
+  it('should return 200 on GET labels', async () => {
     const response = await buildResponse(app, 'GET', 'labelsIndex', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('labels get new label page', async () => {
+  it('should return 200 on GET labelsNew', async () => {
     const response = await buildResponse(app, 'GET', 'labelsNew', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
 
-  it('get edit label page', async () => {
+  it('should return 200 on GET labelsEdit', async () => {
     const labelToEditId = await getEntityIdByData(testData.labels.current, models.label);
 
     const response = await buildResponse(app, 'GET', 'labelsEdit', { cookies: cookie, paramsId: labelToEditId });
@@ -46,7 +45,7 @@ describe('test labels CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('create label', async () => {
+  it('should create label', async () => {
     const data = testData.labels.new;
     const response = await buildResponse(app, 'POST', 'labelsCreate', { data, cookies: cookie });
 
@@ -56,7 +55,7 @@ describe('test labels CRUD', () => {
     expect(createdLabel).toMatchObject(data);
   });
 
-  it('update label', async () => {
+  it('should update label', async () => {
     const labelToUpdateId = await getEntityIdByData(testData.labels.current, models.label);
     const data = testData.labels.toUpdate;
 
@@ -68,8 +67,8 @@ describe('test labels CRUD', () => {
     expect(updatedLabel).toMatchObject(data);
   });
 
-  it('delete label', async () => {
-    const labelToDeleteId = await getEntityIdByData(testData.labels.current, models.label);
+  it('should delete label', async () => {
+    const labelToDeleteId = await getEntityIdByData(testData.labels.toDelete, models.label);
 
     const response = await buildResponse(app, 'DELETE', 'labelsDelete', { cookies: cookie, paramsId: labelToDeleteId });
 
@@ -78,14 +77,14 @@ describe('test labels CRUD', () => {
     expect(deletedLabel).toBeUndefined();
   });
 
-  it('label binded with task', async () => {
+  it('should relate label with task', async () => {
     const { binded } = testData.labels;
     const bindedLabel = await models.label.query().findOne({ name: binded.name });
     const tasks = await bindedLabel.$relatedQuery('tasks');
     expect(tasks.length > 0).toBeTruthy();
   });
 
-  it('can not delete label binded with tasks', async () => {
+  it('should not delete label binded with tasks', async () => {
     const labelToDeleteId = await getEntityIdByData(testData.labels.binded, models.label);
 
     const response = await buildResponse(app, 'DELETE', 'labelsDelete', { cookies: cookie, paramsId: labelToDeleteId });
@@ -95,11 +94,8 @@ describe('test labels CRUD', () => {
     expect(deletedLabel).toBeDefined();
   });
 
-  afterEach(async () => {
-    await knex('labels').truncate();
-  });
-
   afterAll(async () => {
+    await knex('labels').truncate();
     await app.close();
   });
 });

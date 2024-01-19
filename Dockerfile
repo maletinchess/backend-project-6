@@ -1,4 +1,4 @@
-FROM node:18-slim
+FROM node:20.0.0
 
 RUN apt-get update && apt-get install -yq \
   build-essential \

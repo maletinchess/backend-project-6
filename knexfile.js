@@ -23,7 +23,6 @@ export const test = {
   client: 'sqlite3',
   connection: ':memory:',
   useNullAsDefault: true,
-  // debug: true,
   migrations,
 };
 

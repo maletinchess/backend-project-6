@@ -42,7 +42,9 @@ export default (app) => {
         req.flash('success', i18next.t('flash.labels.update.success'));
         reply.redirect(app.reverse('labelsIndex'));
       } catch (err) {
-        await console.log(err);
+        req.flash('error', i18next.t('flash.labels.update.error'));
+        reply.redirect(app.reverse('labelsIndex'));
+        throw new Error(err);
       }
     })
     .delete('/labels/:id', { name: 'labelsDelete', preValidation: app.authenticate }, async (req, reply) => {
@@ -58,8 +60,7 @@ export default (app) => {
         reply.redirect(app.reverse('labelsIndex'));
         return reply;
       } catch (err) {
-        await console.log(err);
-        throw (err);
+        throw new Error(err);
       }
     });
 };

@@ -65,6 +65,7 @@ export default {
         },
         update: {
           success: 'Метка успешно изменена',
+          error: 'Nelzia izmenit metku',
         },
         delete: {
           success: 'Метка успешно удалена',

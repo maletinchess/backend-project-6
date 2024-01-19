@@ -15,6 +15,14 @@
     "userWithoutTasks": {
       "email": "elbert_abshire52@gmail.com",
       "password": "vtvvtbpoambpwobmnbnu"
+    },
+    "userWithTasksToDelete": {
+      "email": "robert@chase.com",
+      "password": "aoibvpvaiubpbpivutbaviu"
+    },
+    "anotherUserWithoutTasks": {
+      "email": "eric@forman.com",
+      "password": "ifdnavnppaiubiubviabvaavt"
     }
   },
   "statuses": {
@@ -29,6 +37,9 @@
     },
     "statusConnectedWithTask": {
       "name": "process 20%"
+    },
+    "statusToDelete": {
+      "name": "process 30%"
     }
   },
   "tasks": {
@@ -67,6 +78,9 @@
     },
     "binded": {
       "name": "label4"
+    },
+    "toDelete": {
+      "name": "label5"
     }
   }
 }
