@@ -1,8 +1,6 @@
 import i18next from 'i18next';
 import _ from 'lodash';
 
-import { checkIfEntityConnectedWithTask } from './helpers.js';
-
 export default (app) => {
   app
     .get('/statuses', { name: 'statuses', preValidation: app.authenticate }, async (req, reply) => {
