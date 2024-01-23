@@ -31,7 +31,7 @@ describe('test users CRUD', () => {
   });
 
   it('should return 200 on GET users', async () => {
-    const response = await buildResponse(app, 'GET', 'usersIndex');
+    const response = await buildResponse(app, 'GET', 'users');
 
     expect(response.statusCode).toBe(200);
   });

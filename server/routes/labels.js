@@ -1,10 +1,10 @@
 import i18next from 'i18next';
 
-import { checkIfEntityConnectedWithTask } from './helpers.js';
+import _ from 'lodash';
 
 export default (app) => {
   app
-    .get('/labels', { name: 'labelsIndex', preValidation: app.authenticate }, async (req, reply) => {
+    .get('/labels', { name: 'labels', preValidation: app.authenticate }, async (req, reply) => {
       const labels = await app.objection.models.label.query();
       reply.render('labels/index', { labels });
       return reply;
@@ -26,7 +26,7 @@ export default (app) => {
         const validLabel = await app.objection.models.label.fromJson(req.body.data);
         await app.objection.models.label.query().insert(validLabel);
         req.flash('info', i18next.t('flash.labels.create.success'));
-        reply.redirect(app.reverse('labelsIndex'));
+        reply.redirect(app.reverse('labels'));
       } catch (err) {
         const { data } = err;
         req.flash('error', i18next.t('flash.labels.create.error'));
@@ -34,30 +34,31 @@ export default (app) => {
       }
       return reply;
     })
-    .post('/labels/:id', { name: 'labelsUpdate', preValidation: app.authenticate }, async (req, reply) => {
+    .patch('/labels/:id', { name: 'labelsUpdate', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
         const labelToUpdate = await app.objection.models.label.query().findById(id);
         await labelToUpdate.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.labels.update.success'));
-        reply.redirect(app.reverse('labelsIndex'));
+        reply.redirect(app.reverse('labels'));
       } catch (err) {
         req.flash('error', i18next.t('flash.labels.update.error'));
-        reply.redirect(app.reverse('labelsIndex'));
-        throw new Error(err);
+        reply.redirect(app.reverse('labels'));
       }
     })
     .delete('/labels/:id', { name: 'labelsDelete', preValidation: app.authenticate }, async (req, reply) => {
       try {
         const { id } = req.params;
         const labelToDelete = await app.objection.models.label.query().findById(id);
-        if (await checkIfEntityConnectedWithTask(labelToDelete)) {
-          req.flash('error', i18next.t('flash.labels.delete.error'));
-        } else {
+        const tasks = await labelToDelete.$relatedQuery('tasks');
+        await console.log(tasks);
+        if (_.isEmpty(tasks)) {
           await labelToDelete.$query().delete();
           req.flash('success', i18next.t('flash.labels.delete.success'));
+        } else {
+          req.flash('error', i18next.t('flash.labels.delete.error'));
         }
-        reply.redirect(app.reverse('labelsIndex'));
+        reply.redirect(app.reverse('labels'));
         return reply;
       } catch (err) {
         throw new Error(err);

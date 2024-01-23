@@ -26,7 +26,7 @@ describe('test statuses CRUD', () => {
   });
 
   it('should return 200 on GET statuses', async () => {
-    const response = await buildResponse(app, 'GET', 'statusesIndex', { cookies: cookie });
+    const response = await buildResponse(app, 'GET', 'statuses', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
@@ -47,13 +47,13 @@ describe('test statuses CRUD', () => {
     expect(createdSatus).toMatchObject(data);
   });
 
-  it('should update status on POST statusesUpdate', async () => {
+  it('should update status on PATCH statusesUpdate', async () => {
     const data = testData.statuses.toUpdate;
     const currentStatus = testData.statuses.current;
 
     const statusToUpdateId = await getEntityIdByData(currentStatus, models.status);
 
-    const response = await buildResponse(app, 'POST', 'statusesUpdate', { paramsId: statusToUpdateId, data, cookies: cookie });
+    const response = await buildResponse(app, 'PATCH', 'statusesUpdate', { paramsId: statusToUpdateId, data, cookies: cookie });
 
     expect(response.statusCode).toBe(302);
 

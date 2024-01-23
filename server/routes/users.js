@@ -6,7 +6,7 @@ import { isUserConnectedWithTask } from './helpers.js';
 
 export default (app) => {
   app
-    .get('/users', { name: 'usersIndex' }, async (req, reply) => {
+    .get('/users', { name: 'users' }, async (req, reply) => {
       const users = await app.objection.models.user.query();
       reply.render('users/index', { users });
       return reply;
@@ -44,7 +44,7 @@ export default (app) => {
         const userToEdit = await app.objection.models.user.query().findById(id);
         await userToEdit.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.users.edit.success'));
-        reply.redirect(app.reverse('usersIndex'));
+        reply.redirect(app.reverse('users'));
         return reply;
       } catch (err) {
         console.log(err);
@@ -65,7 +65,7 @@ export default (app) => {
           req.logout();
           req.flash('success', i18next.t('flash.users.delete.success'));
         }
-        reply.redirect(app.reverse('usersIndex'));
+        reply.redirect(app.reverse('users'));
         return reply;
       } catch (err) {
         console.log(err);

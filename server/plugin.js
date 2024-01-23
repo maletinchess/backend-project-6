@@ -127,7 +127,7 @@ const registerPlugins = async (app) => {
 
     if (req.user?.id !== normalizedParamsId) {
       req.flash('error', i18next.t('flash.users.authError'));
-      reply.redirect(app.reverse('usersIndex'));
+      reply.redirect(app.reverse('users'));
     }
   });
 

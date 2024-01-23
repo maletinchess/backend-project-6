@@ -26,7 +26,7 @@ describe('test tasks CRUD', () => {
   });
 
   it('should return 200 on GET tasks', async () => {
-    const response = await buildResponse(app, 'GET', 'tasksIndex', { cookies: cookie });
+    const response = await buildResponse(app, 'GET', 'tasks', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });

@@ -115,7 +115,7 @@ const getDataForTasksDelete = async (app, req) => {
 
 export const mapRouteNameToFunction = (routeName) => {
   const mapping = {
-    tasksIndex: getDataForTasksIndex,
+    tasks: getDataForTasksIndex,
     tasksEdit: getDataForTasksEdit,
     tasksNew: getDataForTasksNew,
     tasksShow: getDataForTasksShow,

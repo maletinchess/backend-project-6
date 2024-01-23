@@ -26,7 +26,7 @@ describe('test labels CRUD', () => {
   });
 
   it('should return 200 on GET labels', async () => {
-    const response = await buildResponse(app, 'GET', 'labelsIndex', { cookies: cookie });
+    const response = await buildResponse(app, 'GET', 'labels', { cookies: cookie });
 
     expect(response.statusCode).toBe(200);
   });
@@ -59,7 +59,7 @@ describe('test labels CRUD', () => {
     const labelToUpdateId = await getEntityIdByData(testData.labels.current, models.label);
     const data = testData.labels.toUpdate;
 
-    const response = await buildResponse(app, 'POST', 'labelsUpdate', { cookies: cookie, data, paramsId: labelToUpdateId });
+    const response = await buildResponse(app, 'PATCH', 'labelsUpdate', { cookies: cookie, data, paramsId: labelToUpdateId });
 
     expect(response.statusCode).toBe(302);
 

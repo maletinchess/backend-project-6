@@ -7,8 +7,8 @@ import {
 
 export default (app) => {
   app
-    .get('/tasks', { name: 'tasksIndex' }, async (req, reply) => {
-      const data = await mapRouteNameToFunction('tasksIndex')(app, req);
+    .get('/tasks', { name: 'tasks' }, async (req, reply) => {
+      const data = await mapRouteNameToFunction('tasks')(app, req);
       reply.render('tasks/index', data);
       return reply;
     })
@@ -22,7 +22,7 @@ export default (app) => {
       const { taskToEdit } = data;
       if (!checkIfUserIsTaskCreator(req, taskToEdit)) {
         req.flash('error', i18next.t('flash.tasks.edit.error'));
-        reply.redirect(app.reverse('tasksIndex'));
+        reply.redirect(app.reverse('tasks'));
         return reply;
       }
 
@@ -46,7 +46,7 @@ export default (app) => {
         const validData = { validTask, labels };
         await createTaskTransaction(app, validData);
         req.flash('info', i18next.t('flash.tasks.create.success'));
-        reply.redirect(app.reverse('tasksIndex'));
+        reply.redirect(app.reverse('tasks'));
       } catch (err) {
         const dataForRender = await mapRouteNameToFunction('tasksNew')(app);
         req.flash('error', i18next.t('flash.tasks.create.error'));
@@ -60,7 +60,7 @@ export default (app) => {
       try {
         await updateTaskTransaction(app, graph);
         req.flash('info', i18next.t('flash.tasks.update.success'));
-        reply.redirect(app.reverse('tasksIndex'));
+        reply.redirect(app.reverse('tasks'));
         return reply;
       } catch (err) {
         const dataForRender = await mapRouteNameToFunction('tasksEdit')(app, req);
@@ -78,7 +78,7 @@ export default (app) => {
           await taskToDelete.$query().delete();
           req.flash('info', i18next.t('flash.tasks.delete.success'));
         }
-        reply.redirect(app.reverse('tasksIndex'));
+        reply.redirect(app.reverse('tasks'));
         return reply;
       } catch (err) {
         await console.log(err);
