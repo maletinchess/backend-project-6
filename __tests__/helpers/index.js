@@ -41,8 +41,6 @@ export const getUserIdByData = async (data, user) => {
 };
 
 export const getEntityIdByData = async (data, entity) => {
-  const entityQuery = await entity.query();
-  await console.log(entityQuery, data);
   const { id } = await entity.query().findOne({ name: data.name });
   return id;
 };

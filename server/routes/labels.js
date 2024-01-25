@@ -40,7 +40,6 @@ export default (app) => {
         const labelToUpdate = await app.objection.models.label.query().findById(id);
         await labelToUpdate.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.labels.update.success'));
-        
       } catch (err) {
         req.flash('error', i18next.t('flash.labels.update.error'));
       }

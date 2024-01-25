@@ -63,9 +63,9 @@ export default (app) => {
           req.flash('success', i18next.t('flash.users.delete.success'));
         }
         reply.redirect(app.reverse('users'));
-        return reply;
       } catch (err) {
         req.flash('error', i18next.t('flash.users.delete.unknownError'));
       }
+      return reply;
     });
 };
