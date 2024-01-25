@@ -24,7 +24,6 @@ export default (app) => {
     .post('/users', { name: 'usersCreate' }, async (req, reply) => {
       const user = new app.objection.models.user();
       user.$set(req.body.data);
-
       try {
         const validUser = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().insert(validUser);
@@ -35,7 +34,6 @@ export default (app) => {
         req.flash('error', i18next.t('flash.users.create.error'));
         reply.render('users/new', { user, errors: data });
       }
-
       return reply;
     })
     .post('/users/:id', { name: 'usersUpdate', preValidation: app.authenticate }, async (req, reply) => {
@@ -44,12 +42,11 @@ export default (app) => {
         const userToEdit = await app.objection.models.user.query().findById(id);
         await userToEdit.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.users.edit.success'));
-        reply.redirect(app.reverse('users'));
-        return reply;
       } catch (err) {
-        console.log(err);
-        throw err;
+        req.flash('error', i18next.t('flash.users.edit.error'));
       }
+      reply.redirect(app.reverse('users'));
+      return reply;
     })
     .delete('/users/:id', {
       name: 'usersDelete',
@@ -68,8 +65,7 @@ export default (app) => {
         reply.redirect(app.reverse('users'));
         return reply;
       } catch (err) {
-        console.log(err);
-        throw err;
+        req.flash('error', i18next.t('flash.users.delete.unknownError'));
       }
     });
 };

@@ -61,13 +61,12 @@ export default (app) => {
         await updateTaskTransaction(app, graph);
         req.flash('info', i18next.t('flash.tasks.update.success'));
         reply.redirect(app.reverse('tasks'));
-        return reply;
       } catch (err) {
         const dataForRender = await mapRouteNameToFunction('tasksEdit')(app, req);
         req.flash('error', i18next.t('flash.tasks.update.error'));
         reply.render('tasks/edit', { ...dataForRender, errors: err.data });
-        return reply;
       }
+      return reply;
     })
     .delete('/tasks/:id', { name: 'tasksDelete', preValidation: app.authenticate }, async (req, reply) => {
       try {
@@ -78,11 +77,10 @@ export default (app) => {
           await taskToDelete.$query().delete();
           req.flash('info', i18next.t('flash.tasks.delete.success'));
         }
-        reply.redirect(app.reverse('tasks'));
-        return reply;
       } catch (err) {
-        await console.log(err);
-        throw (err);
+        req.flash('error', i18next.t('flash.tasks.delete.unknownError'));
       }
+      reply.redirect(app.reverse('tasks'));
+      return reply;
     });
 };

@@ -38,11 +38,10 @@ export default (app) => {
         const status = await app.objection.models.status.query().findById(id);
         await status.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.statuses.update.success'));
-        reply.redirect(app.reverse('statuses'));
       } catch (err) {
-        await console.log(err);
-        throw (err);
+        req.flash('error', i18next.t('flash.statuses.update.unknownError'));
       }
+      reply.redirect(app.reverse('statuses'));
       return reply;
     })
     .delete('/statuses/:id', { name: 'statusesDelete', preValidation: app.authenticate }, async (req, reply) => {
@@ -56,12 +55,10 @@ export default (app) => {
         } else {
           req.flash('error', i18next.t('flash.statuses.delete.error'));
         }
-        reply.redirect(app.reverse('statuses'));
-        return reply;
       } catch (err) {
         req.flash('error', i18next.t('flash.statuses.delete.unknownError'));
-        reply.redirect(app.reverse('statuses'));
-        return reply;
       }
+      reply.redirect(app.reverse('statuses'));
+      return reply;
     });
 };

@@ -26,12 +26,12 @@ export default (app) => {
         const validLabel = await app.objection.models.label.fromJson(req.body.data);
         await app.objection.models.label.query().insert(validLabel);
         req.flash('info', i18next.t('flash.labels.create.success'));
-        reply.redirect(app.reverse('labels'));
       } catch (err) {
         const { data } = err;
         req.flash('error', i18next.t('flash.labels.create.error'));
         reply.render(app.reverse('labelsNew'), { label, errors: data });
       }
+      reply.redirect(app.reverse('labels'));
       return reply;
     })
     .patch('/labels/:id', { name: 'labelsUpdate', preValidation: app.authenticate }, async (req, reply) => {
@@ -40,11 +40,12 @@ export default (app) => {
         const labelToUpdate = await app.objection.models.label.query().findById(id);
         await labelToUpdate.$query().patch(req.body.data);
         req.flash('success', i18next.t('flash.labels.update.success'));
-        reply.redirect(app.reverse('labels'));
+        
       } catch (err) {
         req.flash('error', i18next.t('flash.labels.update.error'));
-        reply.redirect(app.reverse('labels'));
       }
+      reply.redirect(app.reverse('labels'));
+      return reply;
     })
     .delete('/labels/:id', { name: 'labelsDelete', preValidation: app.authenticate }, async (req, reply) => {
       try {
@@ -58,10 +59,10 @@ export default (app) => {
         } else {
           req.flash('error', i18next.t('flash.labels.delete.error'));
         }
-        reply.redirect(app.reverse('labels'));
-        return reply;
       } catch (err) {
         throw new Error(err);
       }
+      reply.redirect(app.reverse('labels'));
+      return reply;
     });
 };
