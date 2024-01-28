@@ -71,9 +71,10 @@ describe('test tasks CRUD', () => {
 
     const taskLabels = await Promise.all(
       labelIds
-        .sort((a, b) => (a < b))
-        .map(async (labelId) => models.label.query().findById(labelId)),
+        .map((labelId) => models.label.query().findById(labelId)),
     );
+
+    await console.log(taskLabels);
 
     const expectedTaskData = {
       creator: {
