@@ -67,19 +67,30 @@ describe('test tasks CRUD', () => {
     const { id } = taskWithoutGraph;
     const createdTaskWithGraph = await models.task.query().findById(id).withGraphJoined('[labels, creator, status]');
 
-    const { idForCheck } = testData.labels.current;
+    const labelIds = data.labels;
 
+    const taskLabels = await Promise.all(
+      labelIds
+        .sort((a, b) => (a < b))
+        .map(async (labelId) => models.label.query().findById(labelId)),
+    );
+
+    const expectedTaskData = {
+      creator: {
+        id: 2,
+      },
+      status: {
+        id: 1,
+      },
+      labels: taskLabels,
+    };
+
+    expect(createdTaskWithGraph).toMatchObject(expectedTaskData);
+
+    const { idForCheck } = testData.labels.current;
     const label = await models.label.query().findById(idForCheck);
     const relatedTasks = await label.$relatedQuery('tasks');
-    const [expectedCreatorId, expectedStatusId, expectedLabelsLength] = [2, 1, 3];
 
-    const actualCreatorId = createdTaskWithGraph.creator.id;
-    const actualStatusId = createdTaskWithGraph.status.id;
-    const actualLabelsLength = createdTaskWithGraph.labels.length;
-
-    expect(actualCreatorId).toEqual(expectedCreatorId);
-    expect(actualStatusId).toEqual(expectedStatusId);
-    expect(actualLabelsLength).toEqual(expectedLabelsLength);
     expect(relatedTasks).toContainEqual(taskWithoutGraph);
   });
 

@@ -25,7 +25,7 @@ const normalizeLabels = (labels) => {
 
 const getCommonData = async (app) => {
   const users = await app.objection.models.user.query();
-  const usersNormalized = users.map((user) => ({ ...user, name: `${user.firstName} ${user.lastName}` }));
+  const usersNormalized = users.map((user) => ({ ...user, name: user.name }));
   const statuses = await app.objection.models.status.query();
   const labels = await app.objection.models.label.query();
 
@@ -113,18 +113,24 @@ const getDataForTasksDelete = async (app, req) => {
   return taskToDelete;
 };
 
-export const mapRouteNameToFunction = (routeName) => {
-  const mapping = {
-    tasks: getDataForTasksIndex,
-    tasksEdit: getDataForTasksEdit,
-    tasksNew: getDataForTasksNew,
-    tasksShow: getDataForTasksShow,
-    tasksCreate: getDataForTasksCreate,
-    tasksUpdate: getDataForTasksUpdate,
-    tasksDelete: getDataForTasksDelete,
-  };
-
-  return mapping[routeName];
+export const mapRouteNameToData = (routeName, app, req) => {
+  // переделать на switch и поправить соответственно в роутах
+  switch (routeName) {
+    case 'tasks':
+      return getDataForTasksIndex(app, req);
+    case 'tasksEdit':
+      return getDataForTasksEdit(app, req);
+    case 'tasksNew':
+      return getDataForTasksNew(app);
+    case 'tasksCreate':
+      return getDataForTasksCreate(req);
+    case 'tasksUpdate':
+      return getDataForTasksUpdate(req);
+    case 'tasksDelete':
+      return getDataForTasksDelete(app, req);
+    default:
+      throw new Error(`Unknown ${routeName}`);
+  }
 };
 
 export const createTaskTransaction = async (app, validData) => {

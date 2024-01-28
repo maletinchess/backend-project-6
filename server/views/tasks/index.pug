@@ -32,9 +32,9 @@ block content
           td
             a(href=route('tasksShow', { id: task.id }))= task.name
           td= task.status.name
-          td= `${task.creator.firstName} ${task.creator.lastName}`
+          td= task.creator.name
           if task.executor
-            td= `${task.executor.firstName} ${task.executor.lastName}`
+            td= task.executor.name
           else
             td
           td= task.createdAt
