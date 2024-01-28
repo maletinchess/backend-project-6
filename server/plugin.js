@@ -23,7 +23,6 @@ import encrypt from './lib/secure.cjs';
 
 import ru from './locales/ru.js';
 import en from './locales/en.js';
-// @ts-ignore
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import * as knexConfig from '../knexfile.js';
@@ -118,7 +117,6 @@ const registerPlugins = async (app) => {
       failureRedirect: app.reverse('root'),
       failureFlash: i18next.t('flash.authError'),
     },
-  // @ts-ignore
   )(...args));
 
   app.decorate('checkEditAndDeleteUserPermission', async (req, reply) => {

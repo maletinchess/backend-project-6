@@ -122,6 +122,8 @@ export const mapRouteNameToData = (routeName, app, req) => {
       return getDataForTasksEdit(app, req);
     case 'tasksNew':
       return getDataForTasksNew(app);
+    case 'tasksShow':
+      return getDataForTasksShow(app, req);
     case 'tasksCreate':
       return getDataForTasksCreate(req);
     case 'tasksUpdate':
