@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM node:20
 
 RUN apt-get update && apt-get install -yq \
   build-essential \
@@ -18,6 +18,4 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-CMD [ "bash", "-c", "npm run start" ]
-
-RUN make db-migrate && npm run start
+CMD ["bash", "-c", "make db-migrate && npm start"]
