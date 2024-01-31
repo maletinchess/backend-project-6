@@ -18,6 +18,6 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-RUN docker run --name test make db-migrate
-
 CMD ["bash", "-c", "npm start"]
+
+RUN make db-migrate
