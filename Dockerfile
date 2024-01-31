@@ -12,6 +12,4 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-RUN docker run node:20 make db-migrate
-
-CMD ["bash", "-c", "npm start"]
+CMD ["bash", "-c", "make db-migrate && npm start"]
