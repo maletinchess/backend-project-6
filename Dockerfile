@@ -12,6 +12,6 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-RUN docker exec taskmanager make db-migrate
+RUN docker run taskmanager make db-migrate
 
 CMD ["bash", "-c", "npm start"]
