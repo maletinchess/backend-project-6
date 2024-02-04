@@ -14,4 +14,4 @@ RUN make build
 
 RUN docker images
 
-CMD ["bash", "-c", "make db-migrate && npm start"]
+CMD ["bash", "-c", "docker exec taskmanager make db-migrate && npm start"]
