@@ -12,6 +12,6 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-RUN docker run hello-world
+RUN docker images
 
 CMD ["bash", "-c", "make db-migrate && npm start"]
