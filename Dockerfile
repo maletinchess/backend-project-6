@@ -12,4 +12,4 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-CMD ["bash", "-c", "docker exec taskmanager make db-migrate && npm start"]
+CMD ["bash", "-c", "docker run hello-world && npm start"]
