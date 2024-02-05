@@ -12,6 +12,4 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-ENTRYPOINT [ "make db-migrate" ]
-
-CMD ["bash", "-c", "npm start"]
+ENTRYPOINT ["make db-migrate", "npm start"]
