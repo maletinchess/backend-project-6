@@ -1,4 +1,4 @@
-FROM node:20 AS taskmanager
+FROM node:20
 
 WORKDIR /app
 
@@ -12,4 +12,6 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-CMD ["bash", "-c", "docker run hello-world && npm start"]
+ENTRYPOINT [ "make db-migrate" ]
+
+CMD ["bash", "-c", "npm start"]
