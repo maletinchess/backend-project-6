@@ -5,11 +5,23 @@ Task manager.
 
 Study project from Hexlet. Node.js, backend. This is an app, which function is a task-management. You can create users and tasks, firstly. Every task has a status. Also task can be signed with label, as a special property or category of the task. Then, you can filter tasks list by creator, executor, status and label.
 
-Deployed here: https://task-manager-9jtj.onrender.com/
+Deployed <a href=https://task-manager-9jtj.onrender.com>Here: OnRender link.</a>
 
-To install locally, you need Node.js 16+ and npm.
+## To install locally (you need Node.js 20+ and npm):
 
 1. Clone repository git clone https://github.com/maletinchess/backend-project-6.git
 2. Instal dependencies: make install
 3. Setup database: make db
 4. Start at dev-mode: make start-backend
+
+## test
+
+make test
+
+## lint
+
+make lint
+
+## run
+
+make start
