@@ -51,7 +51,6 @@ export default (app) => {
         const { id } = req.params;
         const labelToDelete = await app.objection.models.label.query().findById(id);
         const tasks = await labelToDelete.$relatedQuery('tasks');
-        await console.log(tasks);
         if (_.isEmpty(tasks)) {
           await labelToDelete.$query().delete();
           req.flash('success', i18next.t('flash.labels.delete.success'));

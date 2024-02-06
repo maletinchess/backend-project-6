@@ -88,9 +88,6 @@ describe('test users CRUD', () => {
   it('should delete user\'s profile if he has not tasks', async () => {
     const userToDeleteId = await getUserIdByData(testData.users.userWithoutTasks, models.user);
 
-    const { anotherUserWithoutTasks } = testData.users;
-    await console.log(encrypt(anotherUserWithoutTasks.password));
-
     const newCookie = await signIn(app, app.reverse('session'), testData.users.userWithoutTasks);
 
     const responseDelete = await buildResponse(app, 'DELETE', 'usersDelete', { cookies: newCookie, paramsId: userToDeleteId });

@@ -114,7 +114,6 @@ const getDataForTasksDelete = async (app, req) => {
 };
 
 export const mapRouteNameToData = (routeName, app, req) => {
-  // переделать на switch и поправить соответственно в роутах
   switch (routeName) {
     case 'tasks':
       return getDataForTasksIndex(app, req);
