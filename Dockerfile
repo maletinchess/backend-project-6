@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:20 as firstlayer
 
 WORKDIR /app
 
@@ -12,4 +12,10 @@ COPY . .
 ENV NODE_ENV=production
 RUN make build
 
-CMD ["bash", "-c", "make db-migrate && npm start"]
+CMD ["bash", "-c", "make db-migrate"]
+
+FROM node:20
+
+COPY --from=firstlayer .  .
+
+CMD ["bash", "-c", "npm run start"]
