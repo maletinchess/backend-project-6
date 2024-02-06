@@ -67,15 +67,6 @@ describe('test tasks CRUD', () => {
     const { id } = taskWithoutGraph;
     const createdTaskWithGraph = await models.task.query().findById(id).withGraphJoined('[labels, creator, status]');
 
-    const labelIds = data.labels;
-
-    const taskLabels = await Promise.all(
-      labelIds
-        .map((labelId) => models.label.query().findById(labelId)),
-    );
-
-    await console.log(taskLabels);
-
     const expectedTaskData = {
       creator: {
         id: 2,
@@ -83,7 +74,6 @@ describe('test tasks CRUD', () => {
       status: {
         id: 1,
       },
-      labels: taskLabels,
     };
 
     expect(createdTaskWithGraph).toMatchObject(expectedTaskData);

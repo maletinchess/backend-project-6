@@ -20,4 +20,6 @@ WORKDIR /app
 
 COPY --from=firstlayer /app /app
 
+ENV NODE_ENV=production
+
 CMD ["bash", "-c", "npm run start"]
