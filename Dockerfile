@@ -16,6 +16,8 @@ CMD ["bash", "-c", "make db-migrate"]
 
 FROM node:20
 
-COPY --from=firstlayer .  .
+WORKDIR /app
+
+COPY --from=firstlayer /app /app
 
 CMD ["bash", "-c", "npm run start"]
